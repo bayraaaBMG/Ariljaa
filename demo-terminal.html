@@ -162,6 +162,13 @@
     padding:26px 0 40px;line-height:1.7}
   .note b{color:var(--amber)}
 
+  /* ---- Keyboard hint bar ---- */
+  .kb-hint{
+    font-family:'JetBrains Mono',monospace;font-size:.62rem;
+    color:var(--muted);padding:6px 0 0;letter-spacing:.06em;
+  }
+  .kb-hint b{color:var(--cream-dim)}
+
   /* onboarding modal */
   .overlay{position:fixed;inset:0;background:rgba(6,5,4,.82);backdrop-filter:blur(6px);z-index:200;
     display:none;align-items:center;justify-content:center;padding:20px;animation:fade .3s}
@@ -217,7 +224,11 @@
       </div>
       <button class="btn" id="helpBtn" title="Заавар">? Заавар</button>
       <button class="btn danger" id="resetBtn">↺ Дансыг шинэчлэх</button>
+      <span class="btn" id="sessionTimer" title="Сессийн хугацаа">⏱ 00:00</span>
     </div>
+  </div>
+  <div class="kb-hint">
+    ⌨ <b>B</b> авах &nbsp;·&nbsp; <b>S</b> зарах &nbsp;·&nbsp; <b>X</b> бүгдийг хаах &nbsp;·&nbsp; <b>Space</b> зогсоох/үргэлжлүүлэх &nbsp;·&nbsp; <b>1/2/4</b> хурд
   </div>
 
   <div class="acct">
@@ -343,10 +354,12 @@ const store={
 
 /* ---------- Хэрэгслүүд ---------- */
 const SYMS={
-  EURUSD:{name:'EUR/USD', price:1.08500, contract:100000, lev:100, spread:0.00012, vol:0.00045, dec:5, step:0.01, defVol:0.10},
-  XAUUSD:{name:'XAU/USD алт', price:2348.00, contract:100, lev:50, spread:0.35, vol:0.0011, dec:2, step:0.01, defVol:0.10},
-  BTCUSD:{name:'BTC/USD', price:67250.00, contract:1, lev:20, spread:14, vol:0.0032, dec:2, step:0.01, defVol:0.10},
-  AAPL:{name:'Apple хувьцаа', price:212.40, contract:100, lev:5, spread:0.06, vol:0.0026, dec:2, step:1, defVol:1}
+  EURUSD:{name:'EUR/USD',    price:1.08500,  contract:100000, lev:100, spread:0.00012, vol:0.00045, dec:5, step:0.01, defVol:0.10},
+  XAUUSD:{name:'XAU/USD алт',price:2348.00,  contract:100,   lev:50,  spread:0.35,   vol:0.0011,  dec:2, step:0.01, defVol:0.10},
+  BTCUSD:{name:'BTC/USD',    price:67250.00, contract:1,     lev:20,  spread:14,     vol:0.0032,  dec:2, step:0.01, defVol:0.10},
+  ETHUSD:{name:'ETH/USD',    price:3420.00,  contract:1,     lev:20,  spread:2.8,    vol:0.0038,  dec:2, step:0.01, defVol:0.10},
+  SPX500:{name:'S&P 500',    price:5320.00,  contract:10,    lev:20,  spread:0.5,    vol:0.00075, dec:1, step:0.01, defVol:0.01},
+  AAPL  :{name:'Apple хувьцаа',price:212.40, contract:100,  lev:5,   spread:0.06,   vol:0.0026,  dec:2, step:1,    defVol:1}
 };
 const KEYS=Object.keys(SYMS);
 const MAX_CANDLES=70, TICKS_PER_CANDLE=7, START_BAL=10000, STOPOUT=40; // margin level %
@@ -360,11 +373,12 @@ let live={}; // sym -> {bid, ask, candles:[{o,h,l,c}], cur:{o,h,l,c}, flash}
 function initLive(){
   KEYS.forEach(k=>{
     const s=SYMS[k], p=s.price;
-    live[k]={mid:p, candles:[], cur:{o:p,h:p,l:p,c:p}};
-    for(let i=0;i<MAX_CANDLES;i++){ // seed history so chart isn't empty
+    live[k]={mid:p, candles:[], cur:{o:p,h:p,l:p,c:p,v:0}, ticks:0};
+    for(let i=0;i<MAX_CANDLES;i++){
       let o=live[k].cur.c, c=o*(1+s.vol*(Math.random()*2-1)*2.2);
       let h=Math.max(o,c)*(1+s.vol*Math.random()), l=Math.min(o,c)*(1-s.vol*Math.random());
-      live[k].candles.push({o,h,l,c}); live[k].cur={o:c,h:c,l:c,c:c}; live[k].mid=c;
+      const v=Math.round(500+Math.random()*1500);
+      live[k].candles.push({o,h,l,c,v}); live[k].cur={o:c,h:c,l:c,c:c,v:0}; live[k].mid=c;
     }
   });
 }
@@ -376,13 +390,14 @@ function tick(){
     const shock=(Math.random()*2-1);
     L.mid=Math.max(s.dec===5?0.0001:0.01, L.mid*(1+s.vol*shock));
     L.cur.c=L.mid; L.cur.h=Math.max(L.cur.h,L.mid); L.cur.l=Math.min(L.cur.l,L.mid);
+    L.cur.v+= Math.round(200+Math.random()*800);
   });
   tickCount++;
   if(tickCount>=TICKS_PER_CANDLE){
     tickCount=0;
     KEYS.forEach(k=>{
       const L=live[k]; L.candles.push({...L.cur}); if(L.candles.length>MAX_CANDLES)L.candles.shift();
-      L.cur={o:L.mid,h:L.mid,l:L.mid,c:L.mid};
+      L.cur={o:L.mid,h:L.mid,l:L.mid,c:L.mid,v:0};
     });
   }
   checkPending(); checkSLTP(); checkStopout();
@@ -538,11 +553,13 @@ function drawChart(){
   const w=cv.clientWidth, h=cv.clientHeight||360;
   cv.width=w*dpr; cv.height=h*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.clearRect(0,0,w,h);
-  const padR=72, padT=10, padB=14, plotW=w-padR, plotH=h-padT-padB;
+  const padR=72, padT=10, padB=44, volH=36, plotH=h-padT-padB-volH, plotW=w-padR;
 
   const candles=[...L.candles, L.cur];
   let hi=-Infinity, lo=Infinity;
   candles.forEach(c=>{hi=Math.max(hi,c.h);lo=Math.min(lo,c.l);});
+  const volTop=padT+plotH+8, volBase=volTop+volH-4;
+  const maxVol=Math.max(1,...candles.map(c=>c.v||0));
   // багтаах: позицийн SL/TP/open мөн харагдана
   state.positions.filter(p=>p.sym===sel).forEach(p=>{ hi=Math.max(hi,p.open,p.tp||p.open,p.sl||p.open); lo=Math.min(lo,p.open,p.tp||p.open,p.sl||p.open); });
   state.pending.filter(p=>p.sym===sel).forEach(p=>{ hi=Math.max(hi,p.trig); lo=Math.min(lo,p.trig); });
@@ -560,9 +577,17 @@ function drawChart(){
   const n=candles.length, cw=plotW/n, bw=Math.max(2, cw*0.62);
   candles.forEach((c,i)=>{
     const cx=cw*i+cw/2, up=c.c>=c.o;
-    ctx.strokeStyle=up?'#43c47a':'#e0564b'; ctx.fillStyle=up?'#43c47a':'#e0564b';
+    const col=up?'#43c47a':'#e0564b';
+    ctx.strokeStyle=col; ctx.fillStyle=col;
     ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(cx,y(c.h)); ctx.lineTo(cx,y(c.l)); ctx.stroke();
     const yo=y(c.o), yc=y(c.c); ctx.fillRect(cx-bw/2, Math.min(yo,yc), bw, Math.max(1,Math.abs(yc-yo)));
+    // volume bar
+    if(c.v>0){
+      const vh=Math.max(2,((c.v/maxVol)*(volH-6)));
+      ctx.globalAlpha=0.45; ctx.fillStyle=col;
+      ctx.fillRect(cx-bw/2, volBase-vh, bw, vh);
+      ctx.globalAlpha=1;
+    }
   });
 
   // current price line
@@ -737,6 +762,38 @@ $('volPlus').onclick=()=>{ const v=$('vol'); v.value=(parseFloat(v.value||0)+SYM
 $('volMinus').onclick=()=>{ const v=$('vol'); v.value=Math.max(SYMS[sel].step,(parseFloat(v.value||0)-SYMS[sel].step)).toFixed(2); render(); };
 $('vol').addEventListener('input',render);
 window.addEventListener('resize',()=>{ drawChart(); if(ledgerView==='stats')drawEquity(); });
+
+/* ---- Keyboard shortcuts ---- */
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+  if(e.key==='b'||e.key==='B'){ openTrade(1); }
+  else if(e.key==='s'||e.key==='S'){ openTrade(-1); }
+  else if(e.key==='x'||e.key==='X'){
+    if(!state.positions.length){ toast('Хаах позиц алга.'); return; }
+    if(!confirm('Нээлттэй '+state.positions.length+' позицийг бүгдийг хаах уу?')) return;
+    [...state.positions].forEach(p=>closeTrade(p.id,true));
+    toast('Бүх позиц хаагдлаа.','good'); persist(); render();
+  }
+  else if(e.key===' '||e.code==='Space'){
+    e.preventDefault();
+    running=!running;
+    $('playBtn').textContent=running?'⏸ Зогсоох':'▶ Үргэлжлүүлэх';
+    $('playBtn').classList.toggle('on',!running);
+    startLoop();
+  }
+  else if(e.key==='1'){ speed=1; [...$('speeds').children].forEach(b=>b.classList.toggle('on',b.dataset.s==='1')); startLoop(); }
+  else if(e.key==='2'){ speed=2; [...$('speeds').children].forEach(b=>b.classList.toggle('on',b.dataset.s==='2')); startLoop(); }
+  else if(e.key==='4'){ speed=4; [...$('speeds').children].forEach(b=>b.classList.toggle('on',b.dataset.s==='4')); startLoop(); }
+});
+
+/* ---- Session timer ---- */
+const sessionStart=Date.now();
+setInterval(()=>{
+  const s=Math.floor((Date.now()-sessionStart)/1000);
+  const mm=String(Math.floor(s/60)).padStart(2,'0');
+  const ss=String(s%60).padStart(2,'0');
+  $('sessionTimer').textContent='⏱ '+mm+':'+ss;
+},1000);
 
 // onboarding
 $('helpBtn').onclick=()=>$('onboard').classList.add('show');

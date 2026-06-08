@@ -224,9 +224,48 @@
     .chap-head{gap:16px}
     nav.toc{border-radius:16px;margin:0 -8px}
   }
+
+  /* ---- Progress bar ---- */
+  .progress-bar{
+    position:fixed;top:0;left:0;height:3px;background:var(--amber);
+    z-index:100;width:0%;transition:width .1s linear;
+    box-shadow:0 0 8px var(--amber);
+  }
+
+  /* ---- Scroll to top ---- */
+  .totop{
+    position:fixed;bottom:32px;right:28px;z-index:60;
+    width:44px;height:44px;border-radius:50%;
+    background:var(--panel-2);border:1px solid var(--amber);
+    color:var(--amber);font-size:1.1rem;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;
+    transition:opacity .3s,transform .3s;
+  }
+  .totop.show{opacity:1;pointer-events:auto}
+  .totop:hover{transform:translateY(-3px);background:var(--amber);color:var(--ink)}
+
+  /* ---- Chapter read indicator ---- */
+  .chap-num{transition:color .4s}
+  section.read .chap-num{color:var(--green);opacity:.7}
+
+  /* ---- Footer CTA ---- */
+  .footer-cta{margin-bottom:40px;text-align:center}
+  .footer-cta p{margin-bottom:20px}
+  .cta-btn{
+    display:inline-block;background:var(--amber);color:var(--ink);
+    text-decoration:none;font-family:'JetBrains Mono',monospace;
+    font-weight:700;font-size:.82rem;letter-spacing:.06em;
+    text-transform:uppercase;padding:15px 30px;border-radius:11px;
+    transition:filter .2s,transform .2s;
+  }
+  .cta-btn:hover{filter:brightness(1.1);transform:translateY(-2px)}
 </style>
 </head>
 <body>
+
+<div class="progress-bar" id="progressBar"></div>
+<button type="button" class="totop" id="toTop" aria-label="Дээш гүйлгэх">↑</button>
 
 <div class="ticker"><span>МЭДЭГДЭХҮҮН: ЖИЖИГЛЭНГИЙН АРИЛЖААЧДЫН 70–90% НЬ МӨНГӨӨ АЛДДАГ • ЭНЭ БОЛ ХУРДАН БАЯЖИХ АРГА БИШ • ЗӨВХӨН АЛДАЖ БОЛОХ МӨНГИЙГ Л АРИЛЖ БОЛНО • ЭНД ЗААСАН ЗҮЙЛ БОЛ БОЛОВСРОЛ, САНХҮҮГИЙН ЗӨВЛӨГӨӨ БИШ •</span></div>
 
@@ -391,10 +430,10 @@
     <h4>Позицийн хэмжээ тооцоолуур</h4>
     <p class="desc">Эрсдэлийн удирдлагыг практик дээр мэдрэхийн тулд тоонуудаа оруул. Энэ бол чиний хамгийн чухал хэрэгсэл.</p>
     <div class="calc-grid">
-      <div class="field"><label>Дансны хэмжээ ($)</label><input id="acc" type="number" value="1000"></div>
-      <div class="field"><label>Эрсдэл нэг арилжаанд (%)</label><input id="risk" type="number" value="2"></div>
-      <div class="field"><label>Орох үнэ ($)</label><input id="entry" type="number" value="100"></div>
-      <div class="field"><label>Stop-loss үнэ ($)</label><input id="stop" type="number" value="95"></div>
+      <div class="field"><label for="acc">Дансны хэмжээ ($)</label><input id="acc" type="number" value="1000" title="Дансны хэмжээ ам.доллараар" placeholder="1000"></div>
+      <div class="field"><label for="risk">Эрсдэл нэг арилжаанд (%)</label><input id="risk" type="number" value="2" title="Нэг арилжаанд эрсдэх хувь" placeholder="2"></div>
+      <div class="field"><label for="entry">Орох үнэ ($)</label><input id="entry" type="number" value="100" title="Позицид орох үнэ" placeholder="100"></div>
+      <div class="field"><label for="stop">Stop-loss үнэ ($)</label><input id="stop" type="number" value="95" title="Stop-loss тавих үнэ" placeholder="95"></div>
     </div>
     <div class="calc-out">
       <div><div class="k">Эрсдэлд буй мөнгө</div><div class="v risk" id="outRisk">$20.00</div></div>
@@ -503,9 +542,9 @@
 </div></section>
 
 <footer><div class="wrap">
-  <div class="callout" style="margin-bottom:40px;text-align:center">
-    <p style="margin-bottom:20px">Онол хангалттай. Одоо <b>эрсдэлгүй дадлага</b> хий — $10,000 виртуал мөнгөтэй демо терминал дээр stop-loss, эрсдэлийн удирдлага, сахилга багаа төлөвшүүл.</p>
-    <a href="demo-terminal.html" style="display:inline-block;background:var(--amber);color:var(--ink);text-decoration:none;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;padding:15px 30px;border-radius:11px">Демо терминал нээх →</a>
+  <div class="callout footer-cta">
+    <p>Онол хангалттай. Одоо <b>эрсдэлгүй дадлага</b> хий — $10,000 виртуал мөнгөтэй демо терминал дээр stop-loss, эрсдэлийн удирдлага, сахилга багаа төлөвшүүл.</p>
+    <a href="demo-terminal.html" class="cta-btn">Демо терминал нээх →</a>
   </div>
   <div class="disclaimer">
     <h4>Шударга мэдэгдэхүүн</h4>
@@ -515,6 +554,7 @@
 </div></footer>
 
 <script>
+  /* ---- Calculator ---- */
   const ids=['acc','risk','entry','stop'];
   const f=id=>parseFloat(document.getElementById(id).value)||0;
   const fmt=n=>'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -535,13 +575,55 @@
   ids.forEach(id=>document.getElementById(id).addEventListener('input',calc));
   calc();
 
-  // smooth active toc
+  /* ---- Progress bar + scroll-to-top ---- */
+  const bar=document.getElementById('progressBar');
+  const toTop=document.getElementById('toTop');
+  window.addEventListener('scroll',()=>{
+    const pct=scrollY/(document.body.scrollHeight-innerHeight);
+    bar.style.width=(pct*100)+'%';
+    toTop.classList.toggle('show',scrollY>400);
+  },{passive:true});
+  toTop.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+
+  /* ---- Animated hero counters ---- */
+  function animateCount(el,target,suffix,duration){
+    const start=performance.now();
+    const step=ts=>{
+      const p=Math.min((ts-start)/duration,1);
+      const ease=1-Math.pow(1-p,3);
+      el.textContent=Math.round(ease*target)+suffix;
+      if(p<1)requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+  const counters=[
+    {id:null,el:document.querySelector('.stat:nth-child(1) .num'),val:80,suffix:'%~',prefix:'~'},
+    {id:null,el:document.querySelector('.stat:nth-child(2) .num'),val:1,suffix:'%',prefix:'<'},
+  ];
+  const heroObs=new IntersectionObserver(es=>{
+    if(es[0].isIntersecting){
+      animateCount(document.querySelector('.stat:nth-child(1) .num'),80,'%',1200);
+      heroObs.disconnect();
+    }
+  },{threshold:.5});
+  const heroStats=document.querySelector('.hero-stats');
+  if(heroStats)heroObs.observe(heroStats);
+
+  /* ---- Active TOC + chapter read tracking ---- */
   const links=[...document.querySelectorAll('nav.toc a')];
-  const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){
-    links.forEach(l=>l.style.color='');links.forEach(l=>l.style.background='');
-    const a=document.querySelector('nav.toc a[href="#'+e.target.id+'"]');
-    if(a){a.style.color='var(--amber)';a.style.background='var(--panel)';}
-  }})},{rootMargin:'-40% 0px -55% 0px'});
+  const activeLink=document.createElement('style');
+  document.head.appendChild(activeLink);
+  const obs=new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(l=>{l.removeAttribute('style');});
+        const a=document.querySelector('nav.toc a[href="#'+e.target.id+'"]');
+        if(a){a.style.color='var(--amber)';a.style.background='var(--panel)';}
+        // mark as read after 2s visible
+        setTimeout(()=>{ if(document.getElementById(e.target.id)) e.target.classList.add('read'); },2000);
+      }
+    });
+  },{rootMargin:'-40% 0px -55% 0px'});
   document.querySelectorAll('section').forEach(s=>obs.observe(s));
 </script>
 </body>
