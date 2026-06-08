@@ -1,5 +1,5 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/ariljaa-surah-devter.html" }
+    { "source": "/", "destination": "/index.html" }
   ]
 }

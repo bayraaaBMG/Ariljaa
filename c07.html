@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Бүлэг 07 — Эрсдэлийн удирдлага · Арилжаачны Дэвтэр</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<button type="button" class="totop" id="toTop" aria-label="Дээш гүйлгэх">↑</button>
+<div class="ticker"><span>МЭДЭГДЭХҮҮН: ЖИЖИГЛЭНГИЙН АРИЛЖААЧДЫН 70–90% НЬ МӨНГӨӨ АЛДДАГ • ЭНЭ БОЛ ХУРДАН БАЯЖИХ АРГА БИШ • ЗӨВХӨН АЛДАЖ БОЛОХ МӨНГИЙГ Л АРИЛЖ БОЛНО •</span></div>
+
+<nav class="chapnav">
+  <div class="wrap chapnav-inner">
+    <a href="index.html" class="home">← Нүүр</a>
+    <span class="cur" style="color:var(--amber-soft)">★ Бүлэг 07 / 12 — Хамгийн чухал</span>
+    <div class="chapnav-arrows">
+      <a href="c06.html">← Өмнөх</a>
+      <a href="c08.html">Дараах →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="chap-hero">
+  <div class="wrap chap-hero-inner">
+    <div class="chap-num-big">07</div>
+    <span class="chap-kicker">★ Бүлэг 07 — Хамгийн чухал бүлэг</span>
+    <h1 class="chap-title-big">Эрсдэлийн удирдлага</h1>
+    <div class="chap-sub-big">Зөв таах ≠ ашигтай байх</div>
+  </div>
+</div>
+
+<div class="content">
+  <div class="wrap">
+    <p class="body">Хэрэв чи зөвхөн нэг бүлэг уншина гэвэл <b>энэ нь байх ёстой.</b> Амжилттай арилжаачдыг бусдаас ялгадаг зүйл бол "хаашаа явахыг таах" чадвар биш — <em>буруу таахдаа хэр алддаг</em> вэ гэдэг нь. Зөв таах нь чанд биш, алдагдлаа удирдах нь чанд.</p>
+
+    <div class="callout">
+      <p>Чи 50% л зөв таадаг ч урт хугацаанд ашигтай байж чадна — хэрэв ашиг бүр чинь алдагдлаасаа том бол. Эсрэгээр, 70% зөв таадаг ч эрсдэлээ удирдахгүй бол данс хагална. <b>Зөв байх ≠ ашигтай байх.</b></p>
+    </div>
+
+    <p class="body"><b>Алтан дүрэм 1 — Нэг арилжаанд дансныхаа 1–2%-иас илүүг бүү эрсдэл.</b> $1,000 данстай бол нэг арилжаанд $10–20-оос илүү эрсдэхгүй. Энэ нь дараалан 10 удаа алдсан ч амьд үлдэхийг баталгаажуулна.</p>
+
+    <div class="formula">
+      Позицийн хэмжээ = (Данс × Эрсдэл%) ÷ (Орох үнэ − Stop-loss үнэ)<br>
+      <span class="c"># Жишээ: $1000 данс, 2% эрсдэл = $20 эрсдэнэ</span><br>
+      <span class="c"># Орох $100, Stop $95 → 1 нэгжид $5 эрсдэл</span><br>
+      <span class="c"># $20 ÷ $5 = 4 нэгж барина</span>
+    </div>
+
+    <p class="body"><b>Алтан дүрэм 2 — Эрсдэл:Ашгийн харьцаа (R:R) хамгийн багадаа 1:2.</b> $1 эрсдэхдээ $2+ хожих боломжтой арилжаа л хий. Ингэснээр зөвхөн 40% зөв таасан ч ашигтай.</p>
+
+    <div class="calc">
+      <h4>Позицийн хэмжээ тооцоолуур</h4>
+      <p class="desc">Эрсдэлийн удирдлагыг практик дээр мэдрэхийн тулд тоонуудаа оруул.</p>
+      <div class="calc-grid">
+        <div class="field"><label for="acc">Дансны хэмжээ ($)</label><input id="acc" type="number" value="1000" title="Дансны хэмжээ" placeholder="1000"></div>
+        <div class="field"><label for="risk">Эрсдэл нэг арилжаанд (%)</label><input id="risk" type="number" value="2" title="Нэг арилжаанд эрсдэх хувь" placeholder="2"></div>
+        <div class="field"><label for="entry">Орох үнэ ($)</label><input id="entry" type="number" value="100" title="Орох үнэ" placeholder="100"></div>
+        <div class="field"><label for="stop">Stop-loss үнэ ($)</label><input id="stop" type="number" value="95" title="Stop-loss үнэ" placeholder="95"></div>
+      </div>
+      <div class="calc-out">
+        <div><div class="k">Эрсдэлд буй мөнгө</div><div class="v risk" id="outRisk">$20.00</div></div>
+        <div><div class="k">Барих хэмжээ</div><div class="v" id="outSize">4.0 нэгж</div></div>
+        <div><div class="k">Позицийн дүн</div><div class="v" id="outVal">$400.00</div></div>
+      </div>
+      <p class="calc-note" id="calcNote">→ Энэ арилжаанд буруу таасан ч зөвхөн дансныхаа 2%-ийг л алдана.</p>
+    </div>
+
+    <ul class="clean ok">
+      <li><b>Stop-loss заавал тавь</b> — позиц нээхээсээ өмнө хаана гарахаа мэдэж бай.</li>
+      <li><b>Stop-loss-оо эсрэг тийш бүү зөө</b> — "одоо эргэнэ" гэдэг найдвар бол данс хагалагч.</li>
+      <li><b>Алдагдсан позицод бүү нэм</b> (averaging down) — энэ бол хамгийн аюултай зуршил.</li>
+      <li><b>Өдрийн хамгийн их алдагдлын хязгаар тогтоо:</b> тухайлбал 5% алдсан бол тэр өдөр зогс.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="chap-footer">
+    <a href="c06.html" class="cf-btn">
+      <span class="label">← Өмнөх бүлэг</span>
+      <span class="title">Фундаменталь анализ</span>
+    </a>
+    <a href="c08.html" class="cf-btn next">
+      <span class="label">Дараах бүлэг →</span>
+      <span class="title">Сэтгэл зүй</span>
+    </a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div class="disclaimer"><h4>Шударга мэдэгдэхүүн</h4><p>Энэ сайт боловсролын зорилготой. Санхүүгийн зөвлөгөө биш.</p></div>
+  <p class="sig">"Эхлээд амьд үлд. Дараа нь ашгийн тухай ярина."</p>
+</div></footer>
+<script>
+const bar=document.getElementById('progressBar'),toTop=document.getElementById('toTop');
+window.addEventListener('scroll',()=>{const p=scrollY/(document.body.scrollHeight-innerHeight);bar.style.width=(p*100)+'%';toTop.classList.toggle('show',scrollY>400);},{passive:true});
+toTop.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+// Calculator
+const f=id=>parseFloat(document.getElementById(id).value)||0;
+const fmt=n=>'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+function calc(){
+  const acc=f('acc'),risk=f('risk'),entry=f('entry'),stop=f('stop');
+  const riskMoney=acc*risk/100, perUnit=Math.abs(entry-stop);
+  const size=perUnit>0?riskMoney/perUnit:0;
+  document.getElementById('outRisk').textContent=fmt(riskMoney);
+  document.getElementById('outSize').textContent=size.toLocaleString('en-US',{maximumFractionDigits:2})+' нэгж';
+  document.getElementById('outVal').textContent=fmt(size*entry);
+  const tp=entry+perUnit*2*(entry>=stop?1:-1);
+  const note=document.getElementById('calcNote');
+  if(perUnit<=0){note.textContent='→ Орох ба stop-loss үнэ ялгаатай байх ёстой.';}
+  else{note.textContent=`→ Буруу таасан ч зөвхөн дансныхаа ${risk}% (${fmt(riskMoney)})-ийг л алдана. 1:2 харьцаагаар take-profit ~${fmt(tp)}-д тавивал ${fmt(riskMoney*2)} ашиг хайна.`;}
+}
+['acc','risk','entry','stop'].forEach(id=>document.getElementById(id).addEventListener('input',calc));
+calc();
+</script>
+</body>
+</html>
