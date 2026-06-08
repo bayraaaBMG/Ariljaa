@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Түгээмэл асуулт хариулт — Арилжаачны Дэвтэр</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* ---- FAQ accordion ---- */
+  .faq-list{display:grid;gap:12px;margin-top:8px}
+  .faq-item{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    overflow:hidden;transition:border-color .25s}
+  .faq-item.open{border-color:var(--amber)}
+  .faq-q{width:100%;background:none;border:none;text-align:left;cursor:pointer;
+    padding:22px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;
+    color:var(--cream);font-family:'Spectral',serif;font-size:1.12rem;font-weight:700;
+    line-height:1.3;transition:color .2s}
+  .faq-q:hover{color:var(--amber)}
+  .faq-item.open .faq-q{color:var(--amber)}
+  .faq-icon{flex:none;width:28px;height:28px;border-radius:50%;
+    border:1px solid var(--line);color:var(--muted);
+    display:flex;align-items:center;justify-content:center;
+    font-size:.9rem;transition:transform .3s,border-color .3s,color .3s;font-style:normal}
+  .faq-item.open .faq-icon{transform:rotate(45deg);border-color:var(--amber);color:var(--amber)}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.4,0,.2,1)}
+  .faq-a-inner{padding:0 24px 24px;color:var(--cream-dim);font-weight:300;
+    font-size:1rem;line-height:1.75;border-top:1px solid var(--line)}
+  .faq-a-inner p{padding-top:18px;margin-bottom:12px}
+  .faq-a-inner p:last-child{margin-bottom:0}
+  .faq-a-inner b{color:var(--cream);font-weight:600}
+  .faq-a-inner em{color:var(--amber-soft);font-style:italic}
+  .faq-a-inner ul{list-style:none;margin:8px 0;display:grid;gap:8px}
+  .faq-a-inner ul li{padding-left:22px;position:relative}
+  .faq-a-inner ul li::before{content:"›";position:absolute;left:4px;color:var(--amber);
+    font-family:'Spectral',serif;font-size:1.1rem;top:-1px}
+
+  /* ---- Category badge ---- */
+  .faq-badge{display:inline-block;font-family:'JetBrains Mono',monospace;
+    font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;
+    background:var(--ink-2);color:var(--amber);border:1px solid var(--line);
+    border-radius:6px;padding:3px 10px;margin-bottom:28px}
+
+  /* ---- Source note ---- */
+  .source-note{background:var(--ink-2);border:1px solid var(--line-soft,var(--line));
+    border-radius:10px;padding:14px 18px;margin-top:40px;
+    font-family:'JetBrains Mono',monospace;font-size:.68rem;
+    color:var(--muted);line-height:1.6}
+  .source-note b{color:var(--cream-dim)}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<button type="button" class="totop" id="toTop" aria-label="Дээш гүйлгэх">↑</button>
+<div class="ticker"><span>МЭДЭГДЭХҮҮН: ЖИЖИГЛЭНГИЙН АРИЛЖААЧДЫН 70–90% НЬ МӨНГӨӨ АЛДДАГ • ЭНЭ БОЛ ХУРДАН БАЯЖИХ АРГА БИШ • ЗӨВХӨН АЛДАЖ БОЛОХ МӨНГИЙГ Л АРИЛЖ БОЛНО •</span></div>
+
+<nav class="chapnav">
+  <div class="wrap chapnav-inner">
+    <a href="index.html" class="home">← Нүүр</a>
+    <span class="cur">Түгээмэл асуулт хариулт</span>
+    <div class="chapnav-arrows">
+      <a href="demo-terminal.html">Демо терминал →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="chap-hero">
+  <div class="wrap chap-hero-inner">
+    <div class="chap-num-big" style="font-size:6rem">FAQ</div>
+    <span class="chap-kicker">Түгээмэл асуулт хариулт · Форекс арилжаа</span>
+    <h1 class="chap-title-big">Шинэхэн арилжаачид хамгийн их асуудаг асуултууд</h1>
+    <div class="chap-sub-big">Шударга, тодорхой хариулт</div>
+  </div>
+</div>
+
+<div class="content">
+  <div class="wrap">
+
+    <!-- Үндсэн ойлголт -->
+    <span class="faq-badge">Үндсэн ойлголт</span>
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Форекс гэж юу вэ?
+          <i class="faq-icon">+</i>
+        </button>
+        <div class="faq-a" role="region">
+          <div class="faq-a-inner">
+            <p><b>Форекс (Foreign Exchange)</b> нь дэлхийн хамгийн том санхүүгийн зах зээл бөгөөд валютуудыг хоорондоо арилжаалдаг газар юм. Өдөрт $7+ их наяд долларын арилжаа явагддаг.</p>
+            <p>Банкууд, корпорациуд, засгийн газрууд, хувь хүмүүс оролцоно. Форекс зах зээл <em>7 хоногийн 5 өдөр, 24 цаг</em> нээлттэй байдаг — Лондон, Нью-Йорк, Токио, Сидней гэсэн 4 үндсэн сессэд хуваагддаг.</p>
+            <p>Валютын хослол (жишээ нь EUR/USD) дээр арилжаа хийхэд эхний валютыг <b>суурь валют</b>, хоёр дахийг <b>харьцуулах валют</b> гэнэ.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Форекс арилжаа яг хэрхэн ажилладаг вэ?
+          <i class="faq-icon">+</i>
+        </button>
+        <div class="faq-a" role="region">
+          <div class="faq-a-inner">
+            <p>Валютын хослолыг <b>худалдан авах (long)</b> буюу <b>зарах (short)</b> замаар ашиг олдог.</p>
+            <ul>
+              <li>EUR/USD-г <b>авах</b> = евро өснө гэж найдах. Үнэ өсвөл ашигтай, буурвал алдагдалтай.</li>
+              <li>EUR/USD-г <b>зарах</b> = евро буурна гэж таах. Үнэ буурвал ашигтай.</li>
+            </ul>
+            <p>Ашиг/алдагдлыг пипээр хэмждэг. EUR/USD дээр 1 пип = 0.0001. Лот хэмжээ, хөшүүргээс хамаарч 1 пип = $1–$10+ болдог.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Ямар валютын хослолуудтай ажиллах нь зүйтэй вэ?
+          <i class="faq-icon">+</i>
+        </button>
+        <div class="faq-a" role="region">
+          <div class="faq-a-inner">
+            <p><b>Үндсэн хослолууд (Major pairs)</b> — хамгийн өндөр ликвидет, бага spread:</p>
+            <ul>
+              <li>EUR/USD — хамгийн их арилжаалагддаг</li>
+              <li>GBP/USD — илүү хэлбэлзэлтэй</li>
+              <li>USD/JPY — Азийн сессэд идэвхтэй</li>
+              <li>USD/CHF, AUD/USD, USD/CAD</li>
+            </ul>
+            <p>Эхлэгчдэд <em>EUR/USD</em>-г хамгийн түрүүнд судлахыг зөвлөдөг — spread бага, мэдээлэл ихтэй, хэлбэлзэл тогтвортой.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Эрсдэл & хөшүүрэг -->
+    <span class="faq-badge" style="margin-top:40px;display:inline-block">Эрсдэл · Хөшүүрэг</span>
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Хөшүүрэг (leverage) гэж юу вэ, яагаад аюултай вэ?
+          <i class="faq-icon">+</i>
+        </button>
+        <div class="faq-a" role="region">
+          <div class="faq-a-inner">
+            <p><b>Хөшүүрэг</b> нь өөрийн хөрөнгөөс их хэмжээний позиц барих боломжийг олгодог. 1:100 хөшүүрэгтэй бол $100-аар $10,000-ийн позиц нээж болно.</p>
+            <p>Хоёр талтай хутга:</p>
+            <ul>
+              <li>Ашгийг хэдэн дахин томруулдаг</li>
+              <li>Алдагдлыг мөн ижил хувиар томруулдаг</li>
+              <li>$100 данс + 1:100 хөшүүрэг + 1% эсрэг хөдөлгөөн = данс бүрэн хагарна</li>
+            </ul>
+            <p>Эхлэгчдэд <em>хамгийн багадаа 1:10–1:20 хөшүүрэг</em> дээр ажиллахыг зөвлөнө. Хөшүүрэг том байх тусам эрсдэл экспоненциалаар өснө.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Форекс арилжаа хэр эрсдэлтэй вэ — үнэн хариулт?
+          <i class="faq-icon">+</i>
+        </button>
+        <div class="faq-a" role="region">
+          <div class="faq-a-inner">
+            <p>Үнэн хариулт: <b>маш эрсдэлтэй</b>. Жижиглэнгийн арилжаачдын 70–90% нь мөнгөө алддаг гэсэн статистик олон улсын зохицуулагч байгууллагуудын мэдэгдэлд гардаг.</p>
+            <p>Эрсдэл нэмэгдүүлдэг хүчин зүйлс:</p>
+            <ul>
+              <li>Өндөр хөшүүрэг</li>
+              <li>Мэдлэг, туршлагагүй байх</li>
+              <li>Сэтгэл хөдлөлийн шийдвэр</li>
+              <li>Эрсдэлийн удирдлагагүй байх</li>
+              <li>Stop-loss тавихгүй байх</li>
+            </ul>
+            <p>Эрсдэлийг бууруулах боломжтой — гэхдээ арилгах боломжгүй. <em>Зөвхөн алдаж болох мөнгөө л тавь.</em></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Stop-loss гэж юу вэ, яагаад заавал тавих ёстой вэ?
+          <i class="faq-icon">+</i>
+        </button>
+        <div class="faq-a" role="region">
+          <div class="faq-a-inner">
+            <p><b>Stop-loss</b> нь тодорхой үнэд хүрэхэд позицийг автоматаар хаадаг захиалга юм. Таны алдагдлыг урьдчилан тогтоосон хэмжээнд хязгаарлана.</p>
+            <p>Яагаад чухал вэ:</p>
+            <ul>
+              <li>"Эргэнэ" гэж хүлээвэл жижиг алдагдал аварга болдог</li>
+              <li>Нойрондоо, ажлын цагтаа зах зээл эсрэг хөдлөхийг хамгаалдаг</li>
+              <li>Сэтгэл хөдлөлийг шийдвэрлэлтээс салгадаг</li>
+              <li>Позиц нээхийн өмнө яг хэр алдахаа мэдэж байдаг</li>
+            </ul>
+            <p><em>Stop-loss-гүй арилжаа бол хяналтгүй эрсдэл.</em> Энэ бол арилжааны хамгийн чухал дүрмийн нэг.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Margin call гэж юу вэ?
+          <i class="faq-icon">+</i>
+        </button>
+        <div class="faq-a" role="region">
+          <div class="faq-a-inner">
+            <p><b>Margin call</b> нь таны дансны хөрөнгө шаардлагатай маржин түвшнээс доош унахад брокерын автоматаар позицийг хаах эсвэл нэмэлт хөрөнгө шаардах процесс.</p>
+            <p>Хэрхэн тохиолддог вэ:</p>
+            <ul>
+              <li>Хэт том позиц нээнэ (хэт их хөшүүрэг)</li>
+              <li>Зах зээл эсрэг хөдөлнө</li>
+              <li>Дансны хөрөнгө барьцааны хамгийн бага хэмжээнд хүрнэ</li>
+              <li>Брокер хамгийн их алдагдалтай позицийг <b>албадан хаана</b></li>
+            </ul>
+            <p>Margin call-аас зайлсхийх арга: позицийн хэмжээг дансны хөрөнгөтэй зохимжтой харьцаанд байлга, 1–2%-ийн эрсдэлийн дүрмийг дага.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Эхлэх & стратеги -->
+    <span class="faq-badge" style="margin-top:40px;display:inline-block">Эхлэх · Стратеги</span>
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Форекс арилжаанд хэрхэн эхлэх вэ?
+          <i class="faq-icon">+</i>
+        </button>
+        <div class="faq-a" role="region">
+          <div class="faq-a-inner">
+            <p>Зөв дараалал:</p>
+            <ul>
+              <li><b>1. Сурах</b> — үндсэн ойлголтыг эхлээд ойлго (энэ сайтын 12 бүлэг)</li>
+              <li><b>2. Демо данс</b> — брокероос үнэгүй демо данс нээж виртуал мөнгөөр 3–6 сар дадлага хий</li>
+              <li><b>3. Стратеги</b> — бичигдсэн дүрэм, систем бий болго</li>
+              <li><b>4. Жижиг бодит данс</b> — тогтвортой болсны дараа алдаж болох жижиг мөнгөөр эхэл</li>
+            </ul>
+            <p>Брокер сонгохдоо <em>зохицуулалттай (regulated)</em> байгааг шалга. FCA, ASIC, CySEC зэрэг зохицуулагч байгууллагад бүртгэлтэй байх нь чухал.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Форекс арилжааны үндсэн стратегиуд юу вэ?
+          <i class="faq-icon">+</i>
+        </button>
+        <div class="faq-a" role="region">
+          <div class="faq-a-inner">
+            <p>Хугацааны дагуу 3 үндсэн хэв маяг байдаг:</p>
+            <ul>
+              <li><b>Скальпинг</b> — минутаар арилжаа хийж жижиг ашиг олоно. Хамгийн хурдан, хамгийн стрессийн. Эхлэгчдэд тохиромжгүй.</li>
+              <li><b>Дэй трейдинг</b> — өдрийн доторх арилжаа, шөнөдөө позиц барихгүй. Хагас бүрэн цагийн ажил.</li>
+              <li><b>Свинг трейдинг</b> — хэдэн өдрөөс долоо хоног позиц барина. Ажилтай хүнд тохиромжтой. Эхлэгчдэд хамгийн зүйтэй.</li>
+            </ul>
+            <p>Стратеги сонгохдоо өөрийн чөлөөт цаг, сэтгэл зүйн хэв шинжтэй тохируул. <em>Хурдан мөнгө = хурдан данс хагалах.</em></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Форекс арилжаанд хэр удаан ажиллах шаардлагатай вэ?
+          <i class="faq-icon">+</i>
+        </button>
+        <div class="faq-a" role="region">
+          <div class="faq-a-inner">
+            <p>Стратегиас хамаарна:</p>
+            <ul>
+              <li><b>Скальпинг</b> — өдөрт 4–8+ цаг, дэлгэцийн өмнө байх шаардлагатай</li>
+              <li><b>Дэй трейдинг</b> — өдөрт 2–4 цаг, тодорхой сессийн цагт</li>
+              <li><b>Свинг трейдинг</b> — өдөрт 30 минут–1 цаг хангалттай</li>
+            </ul>
+            <p>Ашигтай болоход ихэнхдээ <em>2–4 жил</em> шаардагддаг. Энэ бол хурдан байх систем биш — ур чадвар дээр суурилсан мэргэжил.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Ашиг олох боломж үнэхээр байдаг уу?
+          <i class="faq-icon">+</i>
+        </button>
+        <div class="faq-a" role="region">
+          <div class="faq-a-inner">
+            <p>Тийм — гэхдээ олонх хүн боддогоос хамаагүй хэцүү. Тогтвортой ашиг олдог хүмүүс байдаг ч тэд цөөн хэдхэн хувь.</p>
+            <p>Ашигтай арилжаачид юу өөр хийдэг вэ:</p>
+            <ul>
+              <li>Эрсдэлийн удирдлагыг хамгийн чухлаар үздэг</li>
+              <li>Алдагдлыг нь биш, тогтолцоогоо хянадаг</li>
+              <li>Арилжаа бүрийг тэмдэглэж, алдаагаасаа сурдаг</li>
+              <li>Сахилга батыг стратегиас чухал гэж үздэг</li>
+              <li>Хурдан баяжихыг хүсдэггүй</li>
+            </ul>
+            <p><em>Боломж байдаг — гэхдээ хөдөлмөр, цаг, сахилга бат шаарддаг.</em></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Spread гэж юу вэ, яагаад чухал вэ?
+          <i class="faq-icon">+</i>
+        </button>
+        <div class="faq-a" role="region">
+          <div class="faq-a-inner">
+            <p><b>Spread</b> нь bid (зарах үнэ) болон ask (авах үнэ) хоорондын зөрүү юм. Энэ нь брокерын гол орлого бөгөөд таны далд зардал болдог.</p>
+            <p>Жишээ нь EUR/USD: Bid 1.08498 / Ask 1.08510 → Spread = 1.2 пип.</p>
+            <ul>
+              <li>Орох мөчид л spread-ийн зардал тань гардаг</li>
+              <li>Скальпинг хийхэд spread маш чухал — жижиг ашгаас хасагдана</li>
+              <li>Мэдээний цагт spread өргөсдөг — болгоомжтой</li>
+            </ul>
+            <p>Брокер сонгохдоо spread-ийн хэмжээг харьцуул. EUR/USD дээр 1–1.5 пип ойлгомжтой.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="source-note">
+      <b>Эх сурвалж:</b> Энэ хуудасны зарим асуулт хариулт нь MOT Capital-ийн Форекс арилжааны FAQ нийтлэл дээр үндэслэсэн бөгөөд сайтын агуулгаар өргөжүүлж гүнзгийрүүлсэн болно.
+    </div>
+
+  </div>
+</div>
+
+<!-- Bottom nav -->
+<div class="wrap">
+  <div class="chap-footer">
+    <a href="index.html" class="cf-btn">
+      <span class="label">← Нүүр хуудас</span>
+      <span class="title">Бүх бүлгийн жагсаалт</span>
+    </a>
+    <a href="demo-terminal.html" class="cf-btn next demo-cta">
+      <span class="label">Дадлага хий →</span>
+      <span class="title">Демо терминал нээх</span>
+    </a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div class="disclaimer">
+    <h4>Шударга мэдэгдэхүүн</h4>
+    <p>Энэ сайт боловсролын зорилготой. Санхүүгийн зөвлөгөө биш. Арилжаа нь хөрөнгөө бүрэн алдах эрсдэлтэй. Зөвхөн алдаж болох мөнгөө л арилж бол.</p>
+  </div>
+  <p class="sig">"Эхлээд амьд үлд. Дараа нь ашгийн тухай ярина."</p>
+</div></footer>
+
+<script>
+/* Progress + scroll-to-top */
+const bar=document.getElementById('progressBar'),toTop=document.getElementById('toTop');
+window.addEventListener('scroll',()=>{
+  const p=scrollY/(document.body.scrollHeight-innerHeight);
+  bar.style.width=(p*100)+'%';
+  toTop.classList.toggle('show',scrollY>400);
+},{passive:true});
+toTop.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+
+/* Accordion */
+document.querySelectorAll('.faq-q').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const item=btn.closest('.faq-item');
+    const answer=item.querySelector('.faq-a');
+    const isOpen=item.classList.contains('open');
+
+    // Close all
+    document.querySelectorAll('.faq-item.open').forEach(el=>{
+      el.classList.remove('open');
+      el.querySelector('.faq-a').style.maxHeight='0';
+      el.querySelector('.faq-q').setAttribute('aria-expanded','false');
+    });
+
+    // Toggle current
+    if(!isOpen){
+      item.classList.add('open');
+      answer.style.maxHeight=answer.scrollHeight+'px';
+      btn.setAttribute('aria-expanded','true');
+    }
+  });
+});
+</script>
+</body>
+</html>
