@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Демо Терминал — Арилжаачны Дэвтэр</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0c0a08; --ink-2:#131009; --panel:#1a1610; --panel-2:#221d15;
+    --line:#332c22; --line-soft:#262019;
+    --cream:#ede4d3; --cream-dim:#b8ad99; --muted:#80776a;
+    --amber:#e0a526; --amber-soft:#f3c969;
+    --green:#43c47a; --green-d:#2a8a52; --red:#e0564b; --red-d:#a83a31;
+    --green-bg:rgba(67,196,122,.12); --red-bg:rgba(224,86,75,.12);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--ink);color:var(--cream);font-family:'Manrope',sans-serif;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+    background-image:radial-gradient(900px 480px at 90% -8%,rgba(224,165,38,.07),transparent 60%);}
+  ::selection{background:var(--amber);color:var(--ink)}
+  .mono{font-family:'JetBrains Mono',monospace}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 18px}
+  .up{color:var(--green)} .down{color:var(--red)}
+
+  /* top bar */
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:16px 0 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .brand{display:flex;flex-direction:column;line-height:1}
+  .brand .k{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.28em;
+    text-transform:uppercase;color:var(--amber);margin-bottom:7px}
+  .brand .t{font-family:'Spectral',serif;font-weight:800;font-size:1.5rem;letter-spacing:-.01em}
+  .controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .btn{font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.05em;
+    background:var(--panel);border:1px solid var(--line);color:var(--cream-dim);
+    padding:9px 14px;border-radius:8px;cursor:pointer;transition:.2s;text-transform:uppercase;
+    text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+  .btn:hover{border-color:var(--amber);color:var(--amber)}
+  .btn.on{background:var(--amber);color:var(--ink);border-color:var(--amber);font-weight:700}
+  .btn.danger:hover{border-color:var(--red);color:var(--red)}
+  .speeds{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .speeds button{background:var(--panel);border:none;color:var(--cream-dim);padding:9px 12px;
+    font-family:'JetBrains Mono',monospace;font-size:.72rem;cursor:pointer;transition:.2s}
+  .speeds button.on{background:var(--amber);color:var(--ink);font-weight:700}
+
+  /* account strip */
+  .acct{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);
+    border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:16px 0}
+  .acct .cell{background:var(--panel);padding:14px 16px}
+  .acct .lab{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+  .acct .val{font-family:'JetBrains Mono',monospace;font-size:1.22rem;font-weight:700}
+
+  /* tabs */
+  .symtabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+  .symtabs::-webkit-scrollbar{display:none}
+  .symtab{background:var(--panel);border:1px solid var(--line);border-radius:9px;
+    padding:10px 16px;cursor:pointer;transition:.2s;white-space:nowrap;display:flex;flex-direction:column;gap:3px;min-width:128px}
+  .symtab .s{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:.82rem;letter-spacing:.04em}
+  .symtab .p{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--cream-dim)}
+  .symtab.on{border-color:var(--amber);background:var(--panel-2)}
+  .symtab.on .s{color:var(--amber)}
+
+  /* main grid */
+  .main{display:grid;grid-template-columns:1fr 320px;gap:16px;margin-top:14px}
+  .chartwrap{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:14px 14px 8px;position:relative;min-height:420px;display:flex;flex-direction:column}
+  .chart-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+  .chart-head .sym{font-family:'Spectral',serif;font-weight:700;font-size:1.4rem}
+  .chart-head .quote{display:flex;gap:18px;align-items:baseline}
+  .chart-head .quote .q{font-family:'JetBrains Mono',monospace;font-size:1.05rem;font-weight:700}
+  .chart-head .quote small{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted);
+    display:block;text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px}
+  canvas{width:100%;flex:1;display:block;border-radius:8px}
+
+  /* order ticket */
+  .ticket{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;height:fit-content}
+  .ticket h3{font-family:'Spectral',serif;font-size:1.1rem;font-weight:700;margin-bottom:4px}
+  .ticket .notional{font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--muted);margin-bottom:16px}
+  .fld{margin-bottom:14px}
+  .fld label{display:block;font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .fld input{width:100%;background:var(--ink);border:1px solid var(--line);border-radius:8px;
+    padding:11px 12px;color:var(--cream);font-family:'JetBrains Mono',monospace;font-size:.95rem;transition:.2s}
+  .fld input:focus{outline:none;border-color:var(--amber)}
+  .volrow{display:flex;gap:8px;align-items:stretch}
+  .volrow input{flex:1}
+  .stepbtn{width:42px;background:var(--ink-2);border:1px solid var(--line);border-radius:8px;color:var(--cream-dim);
+    font-size:1.1rem;cursor:pointer;transition:.2s}
+  .stepbtn:hover{border-color:var(--amber);color:var(--amber)}
+  .sltp{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .trade-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+  .tbtn{border:none;border-radius:10px;padding:14px 8px;cursor:pointer;color:#fff;
+    font-family:'Manrope',sans-serif;font-weight:800;font-size:.92rem;text-transform:uppercase;letter-spacing:.04em;
+    display:flex;flex-direction:column;gap:3px;transition:transform .12s,filter .2s}
+  .tbtn:hover{filter:brightness(1.12)} .tbtn:active{transform:scale(.97)}
+  .tbtn small{font-family:'JetBrains Mono',monospace;font-size:.82rem;font-weight:500;opacity:.92}
+  .tbtn.sell{background:linear-gradient(180deg,var(--red),var(--red-d))}
+  .tbtn.buy{background:linear-gradient(180deg,var(--green),var(--green-d))}
+  .hint{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);margin-top:12px;line-height:1.5}
+
+  .otype{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:14px}
+  .otype button{flex:1;background:var(--ink);border:none;color:var(--cream-dim);padding:9px;cursor:pointer;
+    font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.04em;transition:.2s}
+  .otype button.on{background:var(--panel-2);color:var(--amber);font-weight:700}
+  .risksize{background:var(--ink-2);border:1px solid var(--line-soft);border-radius:9px;padding:11px 12px;margin:4px 0 14px}
+  .rs-row{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--cream-dim);flex-wrap:wrap}
+  .rs-row input{width:54px;background:var(--ink);border:1px solid var(--line);border-radius:6px;color:var(--cream);
+    padding:6px 8px;font-family:'JetBrains Mono',monospace;font-size:.8rem}
+  .rs-row .btn{padding:7px 11px;font-size:.66rem}
+  .rs-out{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);margin-top:9px;line-height:1.5}
+  .modbtn{background:var(--ink-2);border:1px solid var(--line);color:var(--cream-dim);border-radius:6px;
+    padding:5px 9px;font-family:'JetBrains Mono',monospace;font-size:.68rem;cursor:pointer;transition:.2s;margin-right:6px}
+  .modbtn:hover{border-color:var(--amber);color:var(--amber)}
+  .pill.pend{background:rgba(224,165,38,.13);color:var(--amber)}
+
+  /* stats */
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+  .scard{background:var(--ink-2);border:1px solid var(--line-soft);border-radius:11px;padding:15px 16px}
+  .scard .k{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:8px}
+  .scard .v{font-family:'Spectral',serif;font-size:1.5rem;font-weight:700}
+  .eqwrap{background:var(--ink-2);border:1px solid var(--line-soft);border-radius:11px;padding:16px}
+  .eqwrap .t{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:10px}
+  #eqCanvas{width:100%;height:180px;display:block}
+  @media(max-width:900px){ .stat-grid{grid-template-columns:repeat(2,1fr)} }
+
+  /* positions / history */
+  .ledger{margin-top:16px;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .ltabs{display:flex;border-bottom:1px solid var(--line)}
+  .ltab{flex:none;padding:13px 20px;font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:.2s}
+  .ltab.on{color:var(--amber);border-bottom-color:var(--amber)}
+  .tablewrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;min-width:680px}
+  th{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);text-align:right;padding:11px 14px;font-weight:500;border-bottom:1px solid var(--line-soft)}
+  th:first-child,td:first-child{text-align:left}
+  td{font-family:'JetBrains Mono',monospace;font-size:.82rem;padding:12px 14px;text-align:right;
+    border-bottom:1px solid var(--line-soft);color:var(--cream-dim)}
+  tr:last-child td{border-bottom:none}
+  .pill{display:inline-block;padding:3px 9px;border-radius:5px;font-size:.66rem;font-weight:700;letter-spacing:.05em}
+  .pill.buy{background:var(--green-bg);color:var(--green)}
+  .pill.sell{background:var(--red-bg);color:var(--red)}
+  .closebtn{background:var(--ink-2);border:1px solid var(--line);color:var(--cream-dim);border-radius:6px;
+    padding:5px 11px;font-family:'JetBrains Mono',monospace;font-size:.68rem;cursor:pointer;transition:.2s}
+  .closebtn:hover{border-color:var(--red);color:var(--red)}
+  .empty{padding:34px;text-align:center;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:.8rem}
+
+  /* toast */
+  #toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(120%);
+    background:var(--panel-2);border:1px solid var(--amber);border-radius:10px;padding:13px 20px;
+    font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--cream);z-index:100;
+    box-shadow:0 18px 50px -16px rgba(0,0,0,.8);transition:transform .35s cubic-bezier(.2,.9,.3,1);max-width:90vw}
+  #toast.show{transform:translateX(-50%) translateY(0)}
+  #toast.bad{border-color:var(--red)} #toast.good{border-color:var(--green)}
+
+  .note{font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--muted);text-align:center;
+    padding:26px 0 40px;line-height:1.7}
+  .note b{color:var(--amber)}
+
+  /* onboarding modal */
+  .overlay{position:fixed;inset:0;background:rgba(6,5,4,.82);backdrop-filter:blur(6px);z-index:200;
+    display:none;align-items:center;justify-content:center;padding:20px;animation:fade .3s}
+  .overlay.show{display:flex}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .modal{background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--amber);
+    border-radius:18px;max-width:560px;width:100%;padding:34px 32px;box-shadow:0 30px 80px -20px rgba(0,0,0,.9);
+    max-height:88vh;overflow-y:auto;animation:pop .35s cubic-bezier(.2,.9,.3,1)}
+  @keyframes pop{from{transform:translateY(20px) scale(.97);opacity:0}to{transform:none;opacity:1}}
+  .modal .mk{font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.26em;
+    text-transform:uppercase;color:var(--amber);margin-bottom:12px}
+  .modal h2{font-family:'Spectral',serif;font-weight:800;font-size:1.8rem;line-height:1.1;margin-bottom:8px;letter-spacing:-.01em}
+  .modal .sub{color:var(--cream-dim);font-weight:300;font-size:1rem;line-height:1.6;margin-bottom:22px}
+  .steps{display:grid;gap:13px;margin-bottom:24px}
+  .stp{display:flex;gap:14px;align-items:flex-start}
+  .stp .n{flex:none;width:30px;height:30px;border-radius:8px;background:var(--ink);border:1px solid var(--amber);
+    color:var(--amber);font-family:'JetBrains Mono',monospace;font-weight:700;font-size:.85rem;
+    display:flex;align-items:center;justify-content:center}
+  .stp .tx{font-size:.94rem;color:var(--cream-dim);font-weight:300;line-height:1.55}
+  .stp .tx b{color:var(--cream);font-weight:600}
+  .modal .warn{background:var(--red-bg);border:1px solid var(--red-d);border-radius:10px;padding:13px 15px;
+    font-size:.84rem;color:var(--cream-dim);line-height:1.55;margin-bottom:24px}
+  .modal .warn b{color:var(--red)}
+  .modal .start{width:100%;background:var(--amber);color:var(--ink);border:none;border-radius:11px;
+    padding:15px;font-family:'Manrope',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;
+    text-transform:uppercase;letter-spacing:.04em;transition:filter .2s}
+  .modal .start:hover{filter:brightness(1.08)}
+
+  @media(max-width:900px){
+    .main{grid-template-columns:1fr}
+    .acct{grid-template-columns:repeat(2,1fr)}
+    .acct .cell:last-child{grid-column:1/-1}
+    .chartwrap{min-height:340px}
+    table{min-width:620px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="brand">
+      <span class="k">Арилжаачны дэвтэр · дадлагын талбар</span>
+      <span class="t">Демо Терминал</span>
+    </div>
+    <div class="controls">
+      <a class="btn" href="ariljaa-surah-devter.html" id="guideBtn" title="Сургалтын гарын авлага">📖 Гарын авлага</a>
+      <button class="btn" id="playBtn">⏸ Зогсоох</button>
+      <div class="speeds" id="speeds">
+        <button data-s="1" class="on">1×</button>
+        <button data-s="2">2×</button>
+        <button data-s="4">4×</button>
+      </div>
+      <button class="btn" id="helpBtn" title="Заавар">? Заавар</button>
+      <button class="btn danger" id="resetBtn">↺ Дансыг шинэчлэх</button>
+    </div>
+  </div>
+
+  <div class="acct">
+    <div class="cell"><div class="lab">Үлдэгдэл (Balance)</div><div class="val" id="aBalance">$10,000.00</div></div>
+    <div class="cell"><div class="lab">Хөрөнгө (Equity)</div><div class="val" id="aEquity">$10,000.00</div></div>
+    <div class="cell"><div class="lab">Чөлөөт маржин</div><div class="val" id="aFree">$10,000.00</div></div>
+    <div class="cell"><div class="lab">Маржин түвшин</div><div class="val" id="aLevel">—</div></div>
+    <div class="cell"><div class="lab">Хөвөгч ашиг/алдагдал</div><div class="val" id="aFloat">$0.00</div></div>
+  </div>
+
+  <div class="symtabs" id="symtabs"></div>
+
+  <div class="main">
+    <div class="chartwrap">
+      <div class="chart-head">
+        <div class="sym" id="chSym">—</div>
+        <div class="quote">
+          <div><small>Bid (Зарах)</small><span class="q down" id="chBid">—</span></div>
+          <div><small>Ask (Авах)</small><span class="q up" id="chAsk">—</span></div>
+          <div><small>Spread</small><span class="q" id="chSpread" style="color:var(--cream-dim)">—</span></div>
+        </div>
+      </div>
+      <canvas id="chart"></canvas>
+    </div>
+
+    <div class="ticket">
+      <h3>Захиалга өгөх</h3>
+      <div class="notional" id="notional">—</div>
+
+      <div class="otype" id="otype">
+        <button data-o="market" class="on">Зах зээл</button>
+        <button data-o="pending">Хүлээгдэх</button>
+      </div>
+      <div class="fld" id="trigFld" style="display:none">
+        <label>Идэвхжих үнэ (trigger)</label>
+        <input id="trig" type="number" placeholder="ямар үнэд биелэх вэ">
+      </div>
+
+      <div class="fld">
+        <label>Эзлэхүүн (лот)</label>
+        <div class="volrow">
+          <button class="stepbtn" id="volMinus">−</button>
+          <input id="vol" type="number" step="0.01" min="0.01" value="0.10">
+          <button class="stepbtn" id="volPlus">+</button>
+        </div>
+      </div>
+
+      <div class="sltp">
+        <div class="fld"><label>Stop Loss</label><input id="sl" type="number" placeholder="заавал биш"></div>
+        <div class="fld"><label>Take Profit</label><input id="tp" type="number" placeholder="заавал биш"></div>
+      </div>
+
+      <div class="risksize">
+        <div class="rs-row">
+          <span>SL дээр үндэслэн эрсдэл</span>
+          <input id="riskpct" type="number" step="0.5" value="2"><span>%</span>
+          <button class="btn" id="sizeBtn">Лот тооц</button>
+        </div>
+        <div class="rs-out" id="rsOut">SL үнэ оруулаад дарвал, дансныхаа X%-ийг л эрсдэх лотыг тооцоод өгнө.</div>
+      </div>
+
+      <div class="trade-btns">
+        <button class="tbtn sell" id="sellBtn">Зарах<small id="sellP">—</small></button>
+        <button class="tbtn buy" id="buyBtn">Авах<small id="buyP">—</small></button>
+      </div>
+      <div class="hint" id="riskHint">SL тавихгүй бол энэ позицийн эрсдэл хязгааргүй. Эрсдэлийн дүрмээ сана: 1 арилжаанд дансныхаа 1–2%.</div>
+    </div>
+  </div>
+
+  <div class="ledger">
+    <div class="ltabs">
+      <div class="ltab on" data-v="open">Нээлттэй позиц (<span id="openCount">0</span>)</div>
+      <div class="ltab" data-v="hist">Түүх</div>
+      <div class="ltab" data-v="stats">Статистик · Тэмдэглэл</div>
+    </div>
+    <div class="tablewrap" id="tblBox">
+      <table id="tbl"><thead></thead><tbody></tbody></table>
+    </div>
+    <div id="statsBox" style="display:none;padding:20px 18px"></div>
+  </div>
+
+  <div class="note">
+    Бүх үнэ симуляц (random walk) — жинхэнэ зах зээл биш. Энэ бол зөвхөн дадлага хийх, эрсдэлийн мэдрэмж олж авах талбар.<br>
+    <b>Энд хийсэн зүйл бодит мөнгөнд шилждэггүй.</b> Гэхдээ сахилга баг, stop-loss-ийн зуршил энд л төлөвшинө.
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<div class="overlay" id="onboard">
+  <div class="modal">
+    <div class="mk">Арилжаачны дэвтэр · демо терминал</div>
+    <h2>Тавтай морил. Энэ бол дадлагын талбар.</h2>
+    <p class="sub">Чамд <b>$10,000 виртуал мөнгө</b> өгсөн. Жинхэнэ мөнгө биш — энд алдах нь үнэгүй, харин сурах нь үнэтэй. Зорилго: бодит мөнгө тавихаасаа өмнө эрсдэлийн мэдрэмж, сахилга баг олж авах.</p>
+    <div class="steps">
+      <div class="stp"><div class="n">1</div><div class="tx"><b>Хэрэгсэл сонго.</b> Дээд талын табаас EUR/USD, алт, BTC, эсвэл Apple-ийг сонгоно. График нь жинхэнэ юм шиг хөдөлдөг симуляц.</div></div>
+      <div class="stp"><div class="n">2</div><div class="tx"><b>Эрсдэлээ тооцоол.</b> Stop Loss үнэ оруулаад "Лот тооц" дарвал, дансныхаа зөвхөн 1–2%-ийг эрсдэх лотыг өөрөө бодож өгнө. <b>Энэ зуршлыг эндээс эхэл.</b></div></div>
+      <div class="stp"><div class="n">3</div><div class="tx"><b>Арилжаа хий.</b> Ногоон <b>Авах</b> (өснө гэвэл) эсвэл улаан <b>Зарах</b> (буурна гэвэл) товч дар. Stop Loss / Take Profit тавьвал автоматаар хаагдана.</div></div>
+      <div class="stp"><div class="n">4</div><div class="tx"><b>Үр дүнгээ хар.</b> "Статистик" табаас хожих хувь, profit factor, хөрөнгийн муруйгаа хянаж, өөрийгөө сайжруул.</div></div>
+    </div>
+    <div class="warn"><b>Санах зүйл:</b> хэт том лот барьж хөшүүрэг хэтрүүлбэл маржин хүрэлцэхгүй болж позиц <b>албадан хаагдана (stop out)</b> — яг л жинхэнэ дансанд. Эхлээд жижгээр, болгоомжтой.</div>
+    <button class="start" id="startBtn">Дадлага эхлэх →</button>
+  </div>
+</div>
+
+<script>
+/* ---------- Persistence ----------
+   Дараалал: window.storage (Claude дотор) → localStorage (вэбэд байршуулсан үед) → санах ой (fallback) */
+const mem={};
+const store={
+  async get(k){
+    try{ if(window.storage){ const r=await window.storage.get(k); return r?JSON.parse(r.value):null; } }catch(e){}
+    try{ const v=localStorage.getItem(k); if(v!==null) return JSON.parse(v); }catch(e){}
+    return (k in mem)?mem[k]:null;
+  },
+  async set(k,v){
+    const json=JSON.stringify(v); let ok=false;
+    try{ if(window.storage){ await window.storage.set(k,json,false); ok=true; } }catch(e){}
+    try{ localStorage.setItem(k,json); }catch(e){}
+    mem[k]=v;
+  }
+};
+
+/* ---------- Хэрэгслүүд ---------- */
+const SYMS={
+  EURUSD:{name:'EUR/USD', price:1.08500, contract:100000, lev:100, spread:0.00012, vol:0.00045, dec:5, step:0.01, defVol:0.10},
+  XAUUSD:{name:'XAU/USD алт', price:2348.00, contract:100, lev:50, spread:0.35, vol:0.0011, dec:2, step:0.01, defVol:0.10},
+  BTCUSD:{name:'BTC/USD', price:67250.00, contract:1, lev:20, spread:14, vol:0.0032, dec:2, step:0.01, defVol:0.10},
+  AAPL:{name:'Apple хувьцаа', price:212.40, contract:100, lev:5, spread:0.06, vol:0.0026, dec:2, step:1, defVol:1}
+};
+const KEYS=Object.keys(SYMS);
+const MAX_CANDLES=70, TICKS_PER_CANDLE=7, START_BAL=10000, STOPOUT=40; // margin level %
+
+/* ---------- Төлөв ---------- */
+let state={ balance:START_BAL, positions:[], pending:[], history:[], curve:[START_BAL], nextId:1 };
+let sel='EURUSD', orderType='market';
+let running=true, speed=1, baseInterval=720, timer=null, tickCount=0;
+let live={}; // sym -> {bid, ask, candles:[{o,h,l,c}], cur:{o,h,l,c}, flash}
+
+function initLive(){
+  KEYS.forEach(k=>{
+    const s=SYMS[k], p=s.price;
+    live[k]={mid:p, candles:[], cur:{o:p,h:p,l:p,c:p}};
+    for(let i=0;i<MAX_CANDLES;i++){ // seed history so chart isn't empty
+      let o=live[k].cur.c, c=o*(1+s.vol*(Math.random()*2-1)*2.2);
+      let h=Math.max(o,c)*(1+s.vol*Math.random()), l=Math.min(o,c)*(1-s.vol*Math.random());
+      live[k].candles.push({o,h,l,c}); live[k].cur={o:c,h:c,l:c,c:c}; live[k].mid=c;
+    }
+  });
+}
+
+/* ---------- Үнэ нэг алхам ---------- */
+function tick(){
+  KEYS.forEach(k=>{
+    const s=SYMS[k], L=live[k];
+    const shock=(Math.random()*2-1);
+    L.mid=Math.max(s.dec===5?0.0001:0.01, L.mid*(1+s.vol*shock));
+    L.cur.c=L.mid; L.cur.h=Math.max(L.cur.h,L.mid); L.cur.l=Math.min(L.cur.l,L.mid);
+  });
+  tickCount++;
+  if(tickCount>=TICKS_PER_CANDLE){
+    tickCount=0;
+    KEYS.forEach(k=>{
+      const L=live[k]; L.candles.push({...L.cur}); if(L.candles.length>MAX_CANDLES)L.candles.shift();
+      L.cur={o:L.mid,h:L.mid,l:L.mid,c:L.mid};
+    });
+  }
+  checkPending(); checkSLTP(); checkStopout();
+  render();
+}
+function quote(k){ const s=SYMS[k],L=live[k]; return {bid:L.mid - s.spread/2, ask:L.mid + s.spread/2}; }
+
+/* ---------- Позиц ---------- */
+function notionalOf(p){ return p.lots*SYMS[p.sym].contract*live[p.sym].mid; }
+function marginOf(p){ return p.lots*SYMS[p.sym].contract*p.open / SYMS[p.sym].lev; }
+function pnlOf(p){
+  const s=SYMS[p.sym], q=quote(p.sym);
+  const close=p.dir>0?q.bid:q.ask;       // авсныг bid-ээр, зарсныг ask-аар үнэлнэ
+  return (close-p.open)*s.contract*p.lots*p.dir;
+}
+function usedMargin(){ return state.positions.reduce((a,p)=>a+marginOf(p),0); }
+function floating(){ return state.positions.reduce((a,p)=>a+pnlOf(p),0); }
+function equity(){ return state.balance+floating(); }
+
+function readSLTP(open,dir){
+  let sl=parseFloat(document.getElementById('sl').value); sl=isNaN(sl)?null:sl;
+  let tp=parseFloat(document.getElementById('tp').value); tp=isNaN(tp)?null:tp;
+  if(sl!==null){ if(dir>0&&sl>=open){toast('Авах: SL нь үнээс доош байх ёстой — алгассан.','bad');sl=null;} if(dir<0&&sl<=open){toast('Зарах: SL нь үнээс дээш байх ёстой — алгассан.','bad');sl=null;} }
+  if(tp!==null){ if(dir>0&&tp<=open){tp=null;} if(dir<0&&tp>=open){tp=null;} }
+  return {sl,tp};
+}
+function openTrade(dir){
+  const s=SYMS[sel], q=quote(sel);
+  let lots=parseFloat(document.getElementById('vol').value);
+  if(!(lots>0)){ toast('Эзлэхүүн буруу байна.','bad'); return; }
+
+  if(orderType==='pending'){
+    const trig=parseFloat(document.getElementById('trig').value);
+    if(isNaN(trig)){ toast('Идэвхжих үнэ оруулна уу.','bad'); return; }
+    const mkt=dir>0?q.ask:q.bid;
+    const {sl,tp}=readSLTP(trig,dir);
+    state.pending.push({id:state.nextId++, sym:sel, dir, lots, trig, below:trig<mkt, sl, tp, t:Date.now()});
+    document.getElementById('trig').value='';document.getElementById('sl').value='';document.getElementById('tp').value='';
+    toast('Хүлээгдэх '+(dir>0?'авах':'зарах')+' захиалга @ '+fmt(trig,s.dec),'good');
+    persist(); render(); return;
+  }
+
+  const open=dir>0?q.ask:q.bid;
+  const margin=lots*s.contract*open/s.lev;
+  if(margin>equity()-usedMargin()){ toast('Чөлөөт маржин хүрэлцэхгүй. Эзлэхүүнээ багасга.','bad'); return; }
+  const {sl,tp}=readSLTP(open,dir);
+  state.positions.push({id:state.nextId++, sym:sel, dir, lots, open, sl, tp, t:Date.now()});
+  document.getElementById('sl').value=''; document.getElementById('tp').value='';
+  toast((dir>0?'АВАХ':'ЗАРАХ')+' '+lots+' лот '+s.name+' @ '+fmt(open,s.dec),'good');
+  persist(); render();
+}
+function fillPending(po){
+  const s=SYMS[po.sym], q=quote(po.sym), open=po.dir>0?q.ask:q.bid;
+  const margin=po.lots*s.contract*open/s.lev;
+  if(margin>equity()-usedMargin()){ toast('Хүлээгдэх захиалга идэвхжсэн ч маржин хүрэлцсэнгүй — цуцлав.','bad'); return false; }
+  state.positions.push({id:po.id, sym:po.sym, dir:po.dir, lots:po.lots, open, sl:po.sl, tp:po.tp, t:Date.now()});
+  toast('Хүлээгдэх захиалга идэвхжлээ · '+s.name+' @ '+fmt(open,s.dec),'good');
+  return true;
+}
+function checkPending(){
+  for(let i=state.pending.length-1;i>=0;i--){
+    const po=state.pending[i], q=quote(po.sym), px=po.dir>0?q.ask:q.bid;
+    const hit = po.below ? px<=po.trig : px>=po.trig;
+    if(hit){ state.pending.splice(i,1); fillPending(po); persist(); }
+  }
+}
+function cancelPending(id){ const i=state.pending.findIndex(p=>p.id===id); if(i<0)return;
+  state.pending.splice(i,1); toast('Хүлээгдэх захиалга цуцлагдлаа.'); persist(); render(); }
+
+function modifyPosition(id){
+  const p=state.positions.find(x=>x.id===id); if(!p)return;
+  const s=SYMS[p.sym];
+  const slIn=prompt('Шинэ Stop Loss үнэ ('+(p.sl!==null?p.sl:'хоосон')+'). Хоосон орхивол хэвээр, "0" бол устгана:', p.sl!==null?p.sl:'');
+  if(slIn!==null){ if(slIn.trim()==='0')p.sl=null; else if(slIn.trim()!==''){ const v=parseFloat(slIn); if(!isNaN(v)){ if((p.dir>0&&v<p.open)||(p.dir<0&&v>p.open))p.sl=v; else toast('SL буруу талд байна — өөрчлөгдсөнгүй.','bad'); } } }
+  const tpIn=prompt('Шинэ Take Profit үнэ ('+(p.tp!==null?p.tp:'хоосон')+'). "0" бол устгана:', p.tp!==null?p.tp:'');
+  if(tpIn!==null){ if(tpIn.trim()==='0')p.tp=null; else if(tpIn.trim()!==''){ const v=parseFloat(tpIn); if(!isNaN(v)){ if((p.dir>0&&v>p.open)||(p.dir<0&&v<p.open))p.tp=v; else toast('TP буруу талд байна — өөрчлөгдсөнгүй.','bad'); } } }
+  toast('Позиц шинэчлэгдлээ.','good'); persist(); render();
+}
+
+function closeTrade(id, silent){
+  const i=state.positions.findIndex(p=>p.id===id); if(i<0)return;
+  const p=state.positions[i], s=SYMS[p.sym], pnl=pnlOf(p), q=quote(p.sym);
+  state.balance+=pnl;
+  state.curve.push(state.balance); if(state.curve.length>400)state.curve.shift();
+  state.history.unshift({sym:p.sym, dir:p.dir, lots:p.lots, open:p.open, close:p.dir>0?q.bid:q.ask, pnl, t:Date.now()});
+  if(state.history.length>200)state.history.pop();
+  state.positions.splice(i,1);
+  if(!silent) toast('Хаалаа · '+(pnl>=0?'+':'')+fmt(pnl,2)+' $', pnl>=0?'good':'bad');
+  persist(); render();
+}
+function checkSLTP(){
+  [...state.positions].forEach(p=>{
+    const q=quote(p.sym); const price=p.dir>0?q.bid:q.ask;
+    if(p.sl!==null && ((p.dir>0&&price<=p.sl)||(p.dir<0&&price>=p.sl))){ closeTrade(p.id,true); toast('Stop-loss биеллээ · '+SYMS[p.sym].name,'bad'); }
+    else if(p.tp!==null && ((p.dir>0&&price>=p.tp)||(p.dir<0&&price<=p.tp))){ closeTrade(p.id,true); toast('Take-profit биеллээ · '+SYMS[p.sym].name,'good'); }
+  });
+}
+function checkStopout(){
+  const um=usedMargin(); if(um<=0)return;
+  const lvl=equity()/um*100;
+  if(lvl<STOPOUT && state.positions.length){
+    // хамгийн их алдагдалтайг албадан хаа (margin call / stop out)
+    let worst=state.positions[0]; state.positions.forEach(p=>{ if(pnlOf(p)<pnlOf(worst))worst=p; });
+    closeTrade(worst.id,true);
+    toast('⚠ STOP OUT — маржин хүрэлцэхгүй болж позиц албадан хаагдлаа. Энэ бол хөшүүргийн хичээл.','bad');
+  }
+}
+
+/* ---------- Render ---------- */
+const $=id=>document.getElementById(id);
+function fmt(n,d=2){ return Number(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d}); }
+function money(n){ return (n<0?'-$':'$')+fmt(Math.abs(n),2); }
+
+function render(){
+  // account
+  const eq=equity(), um=usedMargin(), fl=floating();
+  $('aBalance').textContent=money(state.balance);
+  $('aEquity').textContent=money(eq);
+  $('aFree').textContent=money(eq-um);
+  $('aLevel').textContent= um>0?fmt(eq/um*100,1)+'%':'—';
+  $('aLevel').className='val '+(um>0?(eq/um*100<80?'down':'up'):'');
+  $('aFloat').textContent=money(fl); $('aFloat').className='val '+(fl>0?'up':fl<0?'down':'');
+
+  // symbol tabs
+  const st=$('symtabs');
+  if(st.children.length!==KEYS.length){
+    st.innerHTML=KEYS.map(k=>`<div class="symtab" data-k="${k}"><span class="s">${k}</span><span class="p" id="tabp_${k}"></span></div>`).join('');
+    [...st.children].forEach(el=>el.onclick=()=>{sel=el.dataset.k; resetTicket(); render();});
+  }
+  KEYS.forEach(k=>{ $('tabp_'+k).textContent=fmt(live[k].mid,SYMS[k].dec); });
+  [...st.children].forEach(el=>el.classList.toggle('on', el.dataset.k===sel));
+
+  // chart head + ticket prices
+  const s=SYMS[sel], q=quote(sel);
+  $('chSym').textContent=s.name;
+  $('chBid').textContent=fmt(q.bid,s.dec); $('chAsk').textContent=fmt(q.ask,s.dec);
+  $('chSpread').textContent=fmt(s.spread, s.dec);
+  $('sellP').textContent=fmt(q.bid,s.dec); $('buyP').textContent=fmt(q.ask,s.dec);
+  const lots=parseFloat($('vol').value)||0;
+  $('notional').textContent=`1 лот = ${fmt(s.contract,0)} нэгж · хөшүүрэг 1:${s.lev} · энэ захиалгын маржин ≈ ${money(lots*s.contract*live[sel].mid/s.lev)}`;
+
+  drawChart();
+  renderTable();
+  $('openCount').textContent=state.positions.length;
+}
+function resetTicket(){ const s=SYMS[sel]; $('vol').value=s.defVol; $('vol').step=s.step; $('sl').value=''; $('tp').value=''; const t=$('trig'); if(t)t.value=''; }
+
+/* ---------- Canvas chart ---------- */
+const cv=$('chart'), ctx=cv.getContext('2d');
+function drawChart(){
+  const L=live[sel], s=SYMS[sel];
+  const dpr=window.devicePixelRatio||1;
+  const w=cv.clientWidth, h=cv.clientHeight||360;
+  cv.width=w*dpr; cv.height=h*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,w,h);
+  const padR=72, padT=10, padB=14, plotW=w-padR, plotH=h-padT-padB;
+
+  const candles=[...L.candles, L.cur];
+  let hi=-Infinity, lo=Infinity;
+  candles.forEach(c=>{hi=Math.max(hi,c.h);lo=Math.min(lo,c.l);});
+  // багтаах: позицийн SL/TP/open мөн харагдана
+  state.positions.filter(p=>p.sym===sel).forEach(p=>{ hi=Math.max(hi,p.open,p.tp||p.open,p.sl||p.open); lo=Math.min(lo,p.open,p.tp||p.open,p.sl||p.open); });
+  state.pending.filter(p=>p.sym===sel).forEach(p=>{ hi=Math.max(hi,p.trig); lo=Math.min(lo,p.trig); });
+  const pad=(hi-lo)*0.12||hi*0.001; hi+=pad; lo-=pad;
+  const y=v=>padT+plotH-((v-lo)/(hi-lo))*plotH;
+
+  // grid + axis
+  ctx.font='10px "JetBrains Mono", monospace'; ctx.textBaseline='middle';
+  for(let i=0;i<=4;i++){
+    const gy=padT+plotH*i/4, val=hi-(hi-lo)*i/4;
+    ctx.strokeStyle='rgba(255,255,255,.045)'; ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(plotW,gy); ctx.stroke();
+    ctx.fillStyle='#80776a'; ctx.textAlign='left'; ctx.fillText(fmt(val,s.dec), plotW+8, gy);
+  }
+
+  const n=candles.length, cw=plotW/n, bw=Math.max(2, cw*0.62);
+  candles.forEach((c,i)=>{
+    const cx=cw*i+cw/2, up=c.c>=c.o;
+    ctx.strokeStyle=up?'#43c47a':'#e0564b'; ctx.fillStyle=up?'#43c47a':'#e0564b';
+    ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(cx,y(c.h)); ctx.lineTo(cx,y(c.l)); ctx.stroke();
+    const yo=y(c.o), yc=y(c.c); ctx.fillRect(cx-bw/2, Math.min(yo,yc), bw, Math.max(1,Math.abs(yc-yo)));
+  });
+
+  // current price line
+  const cyp=y(L.mid);
+  ctx.strokeStyle='rgba(224,165,38,.55)'; ctx.setLineDash([4,4]); ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(0,cyp); ctx.lineTo(plotW,cyp); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle='#e0a526'; ctx.fillRect(plotW,cyp-9,padR,18);
+  ctx.fillStyle='#0c0a08'; ctx.textAlign='left'; ctx.font='bold 10px "JetBrains Mono"'; ctx.fillText(fmt(L.mid,s.dec),plotW+8,cyp);
+
+  // position lines
+  state.positions.filter(p=>p.sym===sel).forEach(p=>{
+    line(p.open, '#e0a526', (p.dir>0?'BUY ':'SELL ')+p.lots, y, plotW, padR, false);
+    if(p.sl!==null) line(p.sl,'#e0564b','SL',y,plotW,padR,true);
+    if(p.tp!==null) line(p.tp,'#43c47a','TP',y,plotW,padR,true);
+  });
+  // pending order lines
+  state.pending.filter(p=>p.sym===sel).forEach(p=>{
+    line(p.trig, '#b8ad99', (p.dir>0?'⤴ авах':'⤵ зарах')+' '+p.lots, y, plotW, padR, true);
+  });
+}
+function line(val,col,label,y,plotW,padR,dash){
+  const gy=y(val); ctx.strokeStyle=col; ctx.lineWidth=1;
+  if(dash)ctx.setLineDash([3,3]); ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(plotW,gy); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle=col; ctx.font='9px "JetBrains Mono"'; ctx.textAlign='left'; ctx.fillText(label, 6, gy-5);
+}
+
+/* ---------- Tables ---------- */
+let ledgerView='open';
+function renderTable(){
+  const showStats = ledgerView==='stats';
+  $('tblBox').style.display = showStats?'none':'block';
+  $('statsBox').style.display = showStats?'block':'none';
+  if(showStats){ renderStats(); return; }
+
+  const thead=$('tbl').querySelector('thead'), tb=$('tbl').querySelector('tbody');
+  if(ledgerView==='open'){
+    thead.innerHTML='<tr><th>Хэрэгсэл</th><th>Төрөл</th><th>Лот</th><th>Орсон/Идэвхжих</th><th>Одоо</th><th>SL / TP</th><th>Маржин</th><th>P&L</th><th></th></tr>';
+    const rows=[];
+    state.positions.forEach(p=>{
+      const s=SYMS[p.sym], q=quote(p.sym), now=p.dir>0?q.bid:q.ask, pnl=pnlOf(p);
+      rows.push(`<tr>
+        <td>${p.sym}</td>
+        <td><span class="pill ${p.dir>0?'buy':'sell'}">${p.dir>0?'АВАХ':'ЗАРАХ'}</span></td>
+        <td>${fmt(p.lots,2)}</td><td>${fmt(p.open,s.dec)}</td><td>${fmt(now,s.dec)}</td>
+        <td>${p.sl!==null?fmt(p.sl,s.dec):'—'} / ${p.tp!==null?fmt(p.tp,s.dec):'—'}</td>
+        <td>${money(marginOf(p))}</td>
+        <td class="${pnl>=0?'up':'down'}">${pnl>=0?'+':''}${fmt(pnl,2)}</td>
+        <td style="white-space:nowrap"><button class="modbtn" onclick="modifyPosition(${p.id})">✎ SL/TP</button><button class="closebtn" onclick="closeTrade(${p.id})">Хаах</button></td></tr>`);
+    });
+    state.pending.forEach(p=>{
+      const s=SYMS[p.sym];
+      rows.push(`<tr style="opacity:.82">
+        <td>${p.sym}</td>
+        <td><span class="pill pend">${p.dir>0?'АВАХ':'ЗАРАХ'} ⏳</span></td>
+        <td>${fmt(p.lots,2)}</td><td>${fmt(p.trig,s.dec)}</td><td>хүлээж буй</td>
+        <td>${p.sl!==null?fmt(p.sl,s.dec):'—'} / ${p.tp!==null?fmt(p.tp,s.dec):'—'}</td>
+        <td>—</td><td>—</td>
+        <td><button class="closebtn" onclick="cancelPending(${p.id})">Цуцлах</button></td></tr>`);
+    });
+    tb.innerHTML = rows.length?rows.join(''):'<tr><td colspan="9"><div class="empty">Нээлттэй позиц алга. Дээрх Авах/Зарах товчоор эхэл.</div></td></tr>';
+  } else {
+    thead.innerHTML='<tr><th>Хэрэгсэл</th><th>Төрөл</th><th>Лот</th><th>Орсон</th><th>Хаасан</th><th>Үр дүн</th></tr>';
+    if(!state.history.length){ tb.innerHTML='<tr><td colspan="6"><div class="empty">Хаагдсан арилжаа алга.</div></td></tr>'; return; }
+    const wins=state.history.filter(h=>h.pnl>0).length, wr=(wins/state.history.length*100);
+    tb.innerHTML=`<tr><td colspan="6" style="color:var(--amber)">Нийт ${state.history.length} арилжаа · Хожих хувь ${fmt(wr,0)}% · Нийт ${money(state.history.reduce((a,h)=>a+h.pnl,0))}</td></tr>`+
+    state.history.map(h=>{
+      const s=SYMS[h.sym];
+      return `<tr><td>${h.sym}</td><td><span class="pill ${h.dir>0?'buy':'sell'}">${h.dir>0?'АВАХ':'ЗАРАХ'}</span></td>
+        <td>${fmt(h.lots,2)}</td><td>${fmt(h.open,s.dec)}</td><td>${fmt(h.close,s.dec)}</td>
+        <td class="${h.pnl>=0?'up':'down'}">${h.pnl>=0?'+':''}${fmt(h.pnl,2)} $</td></tr>`;
+    }).join('');
+  }
+}
+
+function renderStats(){
+  const box=$('statsBox'), H=state.history;
+  if(!H.length){ box.innerHTML='<div class="empty">Арилжаа хийж хаасны дараа энд хожих хувь, profit factor, equity муруй зэрэг статистик гарч ирнэ. Энэ хэсэг чамайг тоглогчоос арилжаачин болгоно.</div>'; return; }
+  const wins=H.filter(h=>h.pnl>0), losses=H.filter(h=>h.pnl<0);
+  const gross= wins.reduce((a,h)=>a+h.pnl,0), grossL=Math.abs(losses.reduce((a,h)=>a+h.pnl,0));
+  const total=H.reduce((a,h)=>a+h.pnl,0);
+  const wr= wins.length/H.length*100;
+  const avgW= wins.length?gross/wins.length:0, avgL= losses.length?grossL/losses.length:0;
+  const pf= grossL>0?gross/grossL:(gross>0?Infinity:0);
+  const exp= total/H.length;
+  const best=Math.max(...H.map(h=>h.pnl)), worst=Math.min(...H.map(h=>h.pnl));
+  // max drawdown on curve
+  let peak=state.curve[0], maxDD=0;
+  state.curve.forEach(v=>{ peak=Math.max(peak,v); maxDD=Math.max(maxDD,(peak-v)); });
+  const ddPct= peak>0?maxDD/peak*100:0;
+  const c=(v)=>v>=0?'up':'down';
+  box.innerHTML=`
+   <div class="stat-grid">
+     <div class="scard"><div class="k">Нийт арилжаа</div><div class="v">${H.length}</div></div>
+     <div class="scard"><div class="k">Хожих хувь</div><div class="v ${wr>=50?'up':'down'}">${fmt(wr,1)}%</div></div>
+     <div class="scard"><div class="k">Profit factor</div><div class="v ${pf>=1?'up':'down'}">${pf===Infinity?'∞':fmt(pf,2)}</div></div>
+     <div class="scard"><div class="k">Хүлээлт / арилжаа</div><div class="v ${c(exp)}">${money(exp)}</div></div>
+     <div class="scard"><div class="k">Дундаж ашиг</div><div class="v up">${money(avgW)}</div></div>
+     <div class="scard"><div class="k">Дундаж алдагдал</div><div class="v down">${money(-avgL)}</div></div>
+     <div class="scard"><div class="k">Хамгийн их / бага</div><div class="v"><span class="up">+${fmt(best,0)}</span> / <span class="down">${fmt(worst,0)}</span></div></div>
+     <div class="scard"><div class="k">Max drawdown</div><div class="v down">${money(maxDD)} · ${fmt(ddPct,1)}%</div></div>
+   </div>
+   <div class="eqwrap"><div class="t">Хөрөнгийн муруй (equity curve) — хаагдсан арилжаа бүрийн дараах үлдэгдэл</div><canvas id="eqCanvas"></canvas></div>
+   <div style="font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--muted);margin-top:14px;line-height:1.6">
+     ${pf>=1.5?'→ Profit factor 1.5+ бол сайн систем. ':pf>=1?'→ Profit factor 1-ээс дээш — ашигтай, гэхдээ илүү сайжруулж болно. ':'→ Profit factor 1-ээс доош — энэ систем одоогоор алдагдалтай. Юу болж байгааг тэмдэглэлээсээ хай. '}
+     ${wr<50&&pf>=1?'Хожих хувь чинь 50%-аас бага ч ашигтай байна — учир нь ашиг чинь алдагдлаасаа том. Энэ бол зөв R:R-ийн хүч.':''}
+   </div>`;
+  drawEquity();
+}
+function drawEquity(){
+  const cv=$('eqCanvas'); if(!cv)return; const ctx=cv.getContext('2d');
+  const dpr=window.devicePixelRatio||1, w=cv.clientWidth, h=180;
+  cv.width=w*dpr; cv.height=h*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,w,h);
+  const d=state.curve; if(d.length<2){ctx.fillStyle='#80776a';ctx.font='11px "JetBrains Mono"';ctx.fillText('Өгөгдөл хангалтгүй',12,90);return;}
+  const hi=Math.max(...d), lo=Math.min(...d), pad=(hi-lo)*0.12||1;
+  const top=hi+pad, bot=lo-pad, padL=8, padR=64;
+  const x=i=>padL+i/(d.length-1)*(w-padL-padR), y=v=>10+(h-24)-((v-bot)/(top-bot))*(h-24);
+  // start baseline
+  ctx.strokeStyle='rgba(255,255,255,.08)';ctx.setLineDash([3,3]);
+  const y0=y(START_BAL);ctx.beginPath();ctx.moveTo(padL,y0);ctx.lineTo(w-padR,y0);ctx.stroke();ctx.setLineDash([]);
+  // area + line
+  const last=d[d.length-1], col=last>=START_BAL?'#43c47a':'#e0564b';
+  const grad=ctx.createLinearGradient(0,10,0,h); grad.addColorStop(0,col+'44');grad.addColorStop(1,col+'05');
+  ctx.beginPath(); d.forEach((v,i)=>{i?ctx.lineTo(x(i),y(v)):ctx.moveTo(x(i),y(v));});
+  ctx.lineTo(x(d.length-1),h-12);ctx.lineTo(x(0),h-12);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+  ctx.beginPath(); d.forEach((v,i)=>{i?ctx.lineTo(x(i),y(v)):ctx.moveTo(x(i),y(v));});
+  ctx.strokeStyle=col;ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle=col;ctx.font='bold 11px "JetBrains Mono"';ctx.textAlign='left';
+  ctx.fillText('$'+fmt(last,0), w-padR+6, y(last));
+}
+
+/* ---------- Toast ---------- */
+let toastT;
+function toast(msg,kind){ const t=$('toast'); t.textContent=msg; t.className='show '+(kind||''); clearTimeout(toastT); toastT=setTimeout(()=>t.className=t.className.replace('show',''),2600); }
+
+/* ---------- Engine control ---------- */
+function startLoop(){ clearInterval(timer); if(running) timer=setInterval(tick, baseInterval/speed); }
+$('playBtn').onclick=()=>{ running=!running; $('playBtn').textContent=running?'⏸ Зогсоох':'▶ Үргэлжлүүлэх'; $('playBtn').classList.toggle('on',!running); startLoop(); };
+[...$('speeds').children].forEach(b=>b.onclick=()=>{ speed=+b.dataset.s; [...$('speeds').children].forEach(x=>x.classList.toggle('on',x===b)); startLoop(); });
+$('resetBtn').onclick=async()=>{ if(!confirm('Демо дансыг $10,000 болгож шинэчлэх үү? Түүх, позиц бүгд устана.'))return;
+  state={balance:START_BAL,positions:[],pending:[],history:[],curve:[START_BAL],nextId:1}; await persist(); render(); toast('Данс шинэчлэгдлээ · $10,000','good'); };
+
+document.querySelectorAll('.ltab').forEach(t=>t.onclick=()=>{ ledgerView=t.dataset.v;
+  document.querySelectorAll('.ltab').forEach(x=>x.classList.toggle('on',x===t)); renderTable(); });
+
+// order type
+[...$('otype').children].forEach(b=>b.onclick=()=>{ orderType=b.dataset.o;
+  [...$('otype').children].forEach(x=>x.classList.toggle('on',x===b));
+  $('trigFld').style.display = orderType==='pending'?'block':'none';
+  $('buyBtn').firstChild.textContent = orderType==='pending'?'Авах (хүлээгдэх) ':'Авах';
+  $('sellBtn').firstChild.textContent = orderType==='pending'?'Зарах (хүлээгдэх) ':'Зарах';
+});
+
+// risk-based lot sizing
+$('sizeBtn').onclick=()=>{
+  const s=SYMS[sel], q=quote(sel);
+  const slV=parseFloat($('sl').value);
+  if(isNaN(slV)){ $('rsOut').textContent='Эхлээд Stop Loss үнэ оруулна уу — лотыг тэрнээс тооцоолно.'; return; }
+  const riskPct=parseFloat($('riskpct').value)||0;
+  const riskMoney=equity()*riskPct/100;
+  const entry= orderType==='pending' ? (parseFloat($('trig').value)||q.ask) : q.ask;
+  const dist=Math.abs(entry-slV);
+  if(dist<=0){ $('rsOut').textContent='Орох үнэ ба SL ялгаатай байх ёстой.'; return; }
+  const lots=riskMoney/(dist*s.contract);
+  const rounded=Math.max(s.step, Math.floor(lots/s.step)*s.step);
+  $('vol').value=rounded.toFixed(2);
+  $('rsOut').textContent=`Дансныхаа ${riskPct}% (${money(riskMoney)})-ийг л эрсдэхэд ≈ ${rounded.toFixed(2)} лот. SL хүрвэл яг ${money(riskMoney)} алдана.`;
+  render();
+};
+
+$('buyBtn').onclick=()=>openTrade(1); $('sellBtn').onclick=()=>openTrade(-1);
+$('volPlus').onclick=()=>{ const v=$('vol'); v.value=(parseFloat(v.value||0)+SYMS[sel].step).toFixed(2); render(); };
+$('volMinus').onclick=()=>{ const v=$('vol'); v.value=Math.max(SYMS[sel].step,(parseFloat(v.value||0)-SYMS[sel].step)).toFixed(2); render(); };
+$('vol').addEventListener('input',render);
+window.addEventListener('resize',()=>{ drawChart(); if(ledgerView==='stats')drawEquity(); });
+
+// onboarding
+$('helpBtn').onclick=()=>$('onboard').classList.add('show');
+$('startBtn').onclick=async()=>{ $('onboard').classList.remove('show'); await store.set('demoSeen',true); };
+$('onboard').addEventListener('click',e=>{ if(e.target===$('onboard')) $('onboard').classList.remove('show'); });
+
+async function persist(){ await store.set('demoAcct', {balance:state.balance, history:state.history, curve:state.curve, nextId:state.nextId}); }
+
+/* ---------- Boot ---------- */
+(async function(){
+  initLive();
+  const saved=await store.get('demoAcct');
+  if(saved && typeof saved.balance==='number'){ state.balance=saved.balance; state.history=saved.history||[]; state.curve=saved.curve&&saved.curve.length?saved.curve:[state.balance]; state.nextId=saved.nextId||1; }
+  resetTicket(); render(); startLoop();
+  const seen=await store.get('demoSeen');
+  if(!seen) $('onboard').classList.add('show');
+})();
+</script>
+</body>
+</html>

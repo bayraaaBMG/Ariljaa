@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Арилжаачны Дэвтэр — Шударга Сургалт</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0e0c0a;
+    --ink-2:#16130f;
+    --panel:#1c1813;
+    --panel-2:#221d17;
+    --line:#352e25;
+    --cream:#ede4d3;
+    --cream-dim:#b8ad99;
+    --muted:#8a8070;
+    --amber:#e0a526;
+    --amber-soft:#f3c969;
+    --green:#5fb878;
+    --red:#d9594f;
+    --green-bg:rgba(95,184,120,.1);
+    --red-bg:rgba(217,89,79,.1);
+    --shadow:0 24px 60px -20px rgba(0,0,0,.7);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--ink);
+    color:var(--cream);
+    font-family:'Manrope',sans-serif;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.04;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px;position:relative;z-index:2}
+  ::selection{background:var(--amber);color:var(--ink)}
+
+  /* ---- Risk ticker ---- */
+  .ticker{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    background:var(--red);color:#1a0a08;
+    font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:500;
+    letter-spacing:.08em;text-transform:uppercase;
+    padding:8px 0;overflow:hidden;white-space:nowrap;
+    border-bottom:1px solid rgba(0,0,0,.3);
+  }
+  .ticker span{display:inline-block;padding-left:100%;animation:scroll 32s linear infinite}
+  @keyframes scroll{to{transform:translateX(-100%)}}
+
+  /* ---- Hero ---- */
+  header{
+    min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+    padding:120px 0 80px;position:relative;
+    background:
+      radial-gradient(900px 500px at 80% -10%, rgba(224,165,38,.1), transparent 60%),
+      linear-gradient(180deg,var(--ink),var(--ink-2));
+  }
+  .kicker{
+    font-family:'JetBrains Mono',monospace;font-size:.78rem;letter-spacing:.32em;
+    text-transform:uppercase;color:var(--amber);margin-bottom:28px;
+    opacity:0;animation:rise .9s .1s forwards;
+  }
+  h1{
+    font-family:'Spectral',serif;font-weight:800;
+    font-size:clamp(2.6rem,7vw,5.4rem);line-height:1.02;letter-spacing:-.02em;
+    margin-bottom:28px;max-width:16ch;
+    opacity:0;animation:rise .9s .25s forwards;
+  }
+  h1 em{font-style:italic;color:var(--amber);position:relative}
+  .lede{
+    font-size:clamp(1.05rem,2vw,1.3rem);color:var(--cream-dim);max-width:54ch;
+    font-weight:300;line-height:1.7;
+    opacity:0;animation:rise .9s .4s forwards;
+  }
+  .lede b{color:var(--cream);font-weight:600}
+  .hero-stats{
+    display:flex;gap:48px;margin-top:56px;flex-wrap:wrap;
+    opacity:0;animation:rise .9s .55s forwards;
+  }
+  .stat .num{font-family:'Spectral',serif;font-size:2.8rem;font-weight:700;color:var(--red);line-height:1}
+  .stat .lab{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);margin-top:8px;max-width:22ch}
+  .scroll-hint{
+    position:absolute;bottom:34px;left:50%;transform:translateX(-50%);
+    font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.2em;
+    color:var(--muted);text-transform:uppercase;opacity:0;animation:rise .9s 1s forwards;
+  }
+  .scroll-hint::after{content:"↓";display:block;text-align:center;margin-top:6px;animation:bob 1.8s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+  @keyframes rise{to{opacity:1;transform:none}}
+  [style*="animation:rise"],.kicker,h1,.lede,.hero-stats,.scroll-hint{transform:translateY(24px)}
+
+  /* ---- Section frame ---- */
+  section{padding:90px 0;border-top:1px solid var(--line)}
+  .chap-head{display:flex;align-items:flex-start;gap:28px;margin-bottom:48px}
+  .chap-num{
+    font-family:'Spectral',serif;font-size:clamp(2.4rem,5vw,3.8rem);font-weight:300;
+    font-style:italic;color:var(--amber);line-height:.9;min-width:auto;
+    opacity:.85;
+  }
+  .chap-title{font-family:'Spectral',serif;font-weight:700;font-size:clamp(1.7rem,3.4vw,2.6rem);
+    line-height:1.1;letter-spacing:-.01em}
+  .chap-sub{font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--muted);margin-top:10px}
+  p.body{font-size:1.05rem;color:var(--cream-dim);font-weight:300;margin-bottom:18px;max-width:68ch;line-height:1.75}
+  p.body b{color:var(--cream);font-weight:600}
+  p.body em{color:var(--amber-soft);font-style:italic}
+
+  /* cards / grids */
+  .grid{display:grid;gap:18px;margin-top:8px}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:26px 24px;transition:transform .3s,border-color .3s,background .3s;
+  }
+  .card:hover{transform:translateY(-4px);border-color:var(--amber);background:var(--panel-2)}
+  .card h4{font-family:'Spectral',serif;font-size:1.25rem;font-weight:700;margin-bottom:10px}
+  .card p{font-size:.96rem;color:var(--cream-dim);font-weight:300;line-height:1.65}
+  .card .tag{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.1em;
+    color:var(--amber);text-transform:uppercase;display:block;margin-bottom:14px}
+
+  .term{border-left:2px solid var(--line);padding:4px 0 4px 22px;margin:22px 0}
+  .term strong{font-family:'Spectral',serif;font-size:1.18rem;color:var(--cream);display:block;margin-bottom:6px}
+  .term span{color:var(--cream-dim);font-weight:300;font-size:1rem}
+
+  .callout{
+    background:linear-gradient(180deg,var(--panel-2),var(--panel));
+    border:1px solid var(--amber);border-radius:14px;padding:30px 28px;margin:34px 0;
+    position:relative;box-shadow:var(--shadow);
+  }
+  .callout::before{content:"⚠ МЕНТОРЫН ЗӨВЛӨГӨӨ";font-family:'JetBrains Mono',monospace;
+    font-size:.68rem;letter-spacing:.18em;color:var(--amber);display:block;margin-bottom:14px}
+  .callout p{font-size:1.08rem;color:var(--cream);font-weight:300;line-height:1.75}
+  .callout p b{font-weight:700}
+
+  .danger{border-color:var(--red);box-shadow:0 24px 60px -20px rgba(217,89,79,.35)}
+  .danger::before{content:"✕ ҮХЛИЙН АЛДАА";color:var(--red)}
+
+  ul.clean{list-style:none;margin:14px 0;display:grid;gap:12px}
+  ul.clean li{padding-left:30px;position:relative;color:var(--cream-dim);font-weight:300;font-size:1rem;line-height:1.6}
+  ul.clean li::before{content:"›";position:absolute;left:6px;color:var(--amber);font-family:'Spectral',serif;font-size:1.2rem;top:-2px}
+  ul.clean li b{color:var(--cream);font-weight:600}
+  ul.x li::before{content:"✕";color:var(--red);font-family:'Manrope';font-size:.85rem;top:2px}
+  ul.ok li::before{content:"✓";color:var(--green);font-family:'Manrope';font-size:.9rem;top:2px}
+
+  /* formula */
+  .formula{
+    background:var(--ink-2);border:1px solid var(--line);border-radius:12px;
+    padding:22px 24px;font-family:'JetBrains Mono',monospace;font-size:1.02rem;
+    color:var(--amber-soft);margin:22px 0;overflow-x:auto;line-height:1.8;
+  }
+  .formula .c{color:var(--muted)}
+
+  /* calculator */
+  .calc{
+    background:linear-gradient(180deg,var(--panel-2),var(--ink-2));
+    border:1px solid var(--amber);border-radius:18px;padding:34px 30px;margin:34px 0;
+    box-shadow:var(--shadow);
+  }
+  .calc h4{font-family:'Spectral',serif;font-size:1.5rem;font-weight:700;margin-bottom:6px}
+  .calc .desc{color:var(--cream-dim);font-weight:300;font-size:.96rem;margin-bottom:26px}
+  .calc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  .field label{display:block;font-family:'JetBrains Mono',monospace;font-size:.7rem;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .field input{
+    width:100%;background:var(--ink);border:1px solid var(--line);border-radius:9px;
+    padding:13px 14px;color:var(--cream);font-family:'JetBrains Mono',monospace;font-size:1rem;
+    transition:border-color .2s;
+  }
+  .field input:focus{outline:none;border-color:var(--amber)}
+  .calc-out{
+    margin-top:26px;padding:24px;background:var(--ink);border-radius:12px;
+    border:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);gap:18px;text-align:center;
+  }
+  .calc-out .k{font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .calc-out .v{font-family:'Spectral',serif;font-size:1.7rem;font-weight:700;color:var(--amber)}
+  .calc-out .v.risk{color:var(--red)}
+  .calc-note{font-size:.85rem;color:var(--muted);margin-top:16px;font-weight:300}
+
+  /* roadmap */
+  .road{position:relative;margin-top:20px;padding-left:34px}
+  .road::before{content:"";position:absolute;left:9px;top:8px;bottom:8px;width:2px;
+    background:linear-gradient(180deg,var(--amber),var(--line))}
+  .step{position:relative;padding-bottom:34px}
+  .step::before{content:"";position:absolute;left:-30px;top:4px;width:14px;height:14px;
+    border-radius:50%;background:var(--ink);border:2px solid var(--amber)}
+  .step h4{font-family:'Spectral',serif;font-size:1.3rem;font-weight:700;margin-bottom:6px}
+  .step .when{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.12em;
+    color:var(--amber);text-transform:uppercase;margin-bottom:10px}
+  .step p{color:var(--cream-dim);font-weight:300;font-size:.98rem;line-height:1.65;max-width:64ch}
+
+  /* nav pills */
+  nav.toc{position:sticky;top:36px;z-index:40;background:rgba(20,17,13,.86);
+    backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:50px;
+    padding:8px;margin:0 auto 0;display:flex;gap:4px;overflow-x:auto;max-width:fit-content;
+    box-shadow:var(--shadow);scrollbar-width:none}
+  nav.toc::-webkit-scrollbar{display:none}
+  nav.toc a{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--cream-dim);
+    text-decoration:none;padding:8px 14px;border-radius:50px;white-space:nowrap;transition:.2s}
+  nav.toc a:hover{background:var(--panel);color:var(--amber)}
+
+  footer{padding:80px 0 60px;border-top:1px solid var(--line);background:var(--ink-2)}
+  .disclaimer{background:var(--red-bg);border:1px solid var(--red);border-radius:14px;
+    padding:26px;margin-bottom:40px}
+  .disclaimer h4{font-family:'JetBrains Mono',monospace;font-size:.78rem;letter-spacing:.14em;
+    color:var(--red);text-transform:uppercase;margin-bottom:12px}
+  .disclaimer p{color:var(--cream-dim);font-weight:300;font-size:.95rem;line-height:1.7;max-width:74ch}
+  .sig{font-family:'Spectral',serif;font-style:italic;font-size:1.15rem;color:var(--cream-dim)}
+  .sig b{color:var(--amber);font-style:normal;font-weight:700}
+
+  @media(max-width:760px){
+    .g2,.g3,.calc-grid{grid-template-columns:1fr}
+    .calc-out{grid-template-columns:1fr;gap:22px}
+    .hero-stats{gap:32px}
+    .chap-head{gap:16px}
+    nav.toc{border-radius:16px;margin:0 -8px}
+  }
+</style>
+</head>
+<body>
+
+<div class="ticker"><span>МЭДЭГДЭХҮҮН: ЖИЖИГЛЭНГИЙН АРИЛЖААЧДЫН 70–90% НЬ МӨНГӨӨ АЛДДАГ • ЭНЭ БОЛ ХУРДАН БАЯЖИХ АРГА БИШ • ЗӨВХӨН АЛДАЖ БОЛОХ МӨНГИЙГ Л АРИЛЖ БОЛНО • ЭНД ЗААСАН ЗҮЙЛ БОЛ БОЛОВСРОЛ, САНХҮҮГИЙН ЗӨВЛӨГӨӨ БИШ •</span></div>
+
+<header>
+  <div class="wrap">
+    <div class="kicker">Арилжаачны дэвтэр · 20 жилийн тэмдэглэл</div>
+    <h1>Чамайг баяжуулахаар биш, <em>амьд үлдээхээр</em> бичсэн.</h1>
+    <p class="lede">Энэ сайт чамд "энэ дохиогоор ор, тэгвэл баяжна" гэж хэлэхгүй. Учир нь үнэн нь тийм биш. <b>Туршлагатай арилжаачин шинээр эхэлж буй хүнд хэлэх ёстой бүх зүйлийг</b> — амжилттай хэсэг нь биш, дийлэнх нь хийдэг алдаануудыг нь хүртэл — энд цэгцэлж бичсэн.</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="num">~80%</div><div class="lab">эхний жилдээ данс хагалдаг шинэ арилжаачид</div></div>
+      <div class="stat"><div class="num">&lt;1%</div><div class="lab">урт хугацаанд тогтвортой ашиг олдог хүмүүс</div></div>
+      <div class="stat"><div class="num">2+ жил</div><div class="lab">тогтвортой болоход дунджаар зарцуулагдах хугацаа</div></div>
+    </div>
+  </div>
+  <div class="scroll-hint">эхэлцгээе</div>
+</header>
+
+<div class="wrap">
+<nav class="toc">
+  <a href="#c1">01 Бодит байдал</a>
+  <a href="#c2">02 Хөрөнгө оруулалт vs Арилжаа</a>
+  <a href="#c3">03 Зах зээлүүд</a>
+  <a href="#c4">04 Үндсэн ойлголт</a>
+  <a href="#c5">05 Техник анализ</a>
+  <a href="#c6">06 Фундаменталь</a>
+  <a href="#c7">07 Эрсдэлийн удирдлага</a>
+  <a href="#c8">08 Сэтгэл зүй</a>
+  <a href="#c9">09 Төлөвлөгөө</a>
+  <a href="#c10">10 Тэмдэглэл & бэктэст</a>
+  <a href="#c11">11 Нийтлэг алдаа</a>
+  <a href="#c12">12 Замын зураг</a>
+</nav>
+</div>
+
+<!-- 01 -->
+<section id="c1"><div class="wrap">
+  <div class="chap-head">
+    <div class="chap-num">01</div>
+    <div><div class="chap-title">Эхлээд бодит байдлыг хэлье</div>
+    <div class="chap-sub">Reality check</div></div>
+  </div>
+  <p class="body">Хэрэв чамд хэн нэгэн "сард 20% ашиг", "санхүүгийн эрх чөлөө", "утаснаасаа л арилжаа хий" гэж зарласан бол — тэр чиний мөнгийг хүсэж байгаа болохоос чиний амжилтыг хүсээгүй. <b>Жинхэнэ арилжаа тийм харагддаггүй.</b></p>
+  <p class="body">Үнэн нь ийм: арилжаа бол ур чадвар шаардсан, өрсөлдөөн ихтэй, сэтгэл зүйн хувьд хүнд тоглоом. Чиний эсрэг талд банк, хедж фонд, алгоритм, олон жилийн туршлагатай хүмүүс байгаа. Тэдэнтэй өрсөлдөж байгаагаа ухамсарла.</p>
+  <div class="callout">
+    <p>Анхны зорилго чинь "баяжих" биш, <b>"данс хагалахгүй байх"</b> байх ёстой. Хэрэв чи 2 жил данс хагалалгүй амьд үлдэж чадвал, олонхоос аль хэдийн түрүүлсэн. Хамгаалалт эхэндээ, довтолгоо хожуу.</p>
+  </div>
+  <p class="body">Чи энэ сайтыг уншсанаар баяжихгүй. Гэхдээ <em>яагаад олонх нь алддаг вэ, яаж тэрнээс зайлсхийх вэ</em> гэдгийг ойлгоно. Энэ нь өөрөө аль хэдийн том давуу тал.</p>
+</div></section>
+
+<!-- 02 -->
+<section id="c2"><div class="wrap">
+  <div class="chap-head">
+    <div class="chap-num">02</div>
+    <div><div class="chap-title">Хөрөнгө оруулалт vs Арилжаа</div>
+    <div class="chap-sub">Хоёр өөр тоглоом</div></div>
+  </div>
+  <p class="body">Олон хүн эдгээрийг хольдог. Энэ хоёр огт өөр зүйл, өөр сэтгэлгээ, өөр хугацаа шаарддаг.</p>
+  <div class="grid g2">
+    <div class="card"><span class="tag">Хөрөнгө оруулалт</span><h4>Удаан, тэвчээртэй</h4>
+      <p>Жил, арван жилээр эзэмшинэ. Компанийн бодит өсөлт, хүүгийн нийлмэл өсөлтөд найдна. Цаг хугацаа таны нөхөр. Эрсдэл харьцангуй бага, ажил бага. Дийлэнх хүнд ЭНЭ илүү тохиромжтой.</p></div>
+    <div class="card"><span class="tag">Арилжаа</span><h4>Хурдан, идэвхтэй</h4>
+      <p>Минут, өдөр, долоо хоногоор үнийн хэлбэлзлээс ашиг хайна. Зах зээлийн чиглэл, цаг хугацаа таарах ёстой. Ажил их, эрсдэл өндөр, сэтгэл зүйн дарамт хүнд. Цөөн хүн л үүнд тогтвортой амжилт олдог.</p></div>
+  </div>
+  <div class="callout"><p>Хэрэв чамд тодорхой шалтгаан байхгүй бол — олонх хүний хувьд <b>индекс фондод тогтмол хөрөнгө оруулах</b> нь идэвхтэй арилжаанаас илүү үр дүнтэй, бага стресстэй байдаг. Үүнийг хэлэх нь миний үүрэг. Арилжаа сонирхож байгаа нь буруу биш, гэхдээ нүдээ нээгээд ор.</p></div>
+</div></section>
+
+<!-- 03 -->
+<section id="c3"><div class="wrap">
+  <div class="chap-head">
+    <div class="chap-num">03</div>
+    <div><div class="chap-title">Ямар зах зээлүүд байдаг вэ</div>
+    <div class="chap-sub">Markets</div></div>
+  </div>
+  <p class="body">Эхлэгчид ихэвчлэн хамгийн хэлбэлзэлтэй, хамгийн өндөр хөшүүрэгтэй зах зээлээр (форекс, крипто) эхэлдэг — энэ нь яг хамгийн аюултай нь юм. Эрсдэлийг нь ойлгож сонго.</p>
+  <div class="grid g3">
+    <div class="card"><h4>Хувьцаа</h4><p>Компанийн эзэмшлийн хувь. Удаан, ил тод, мэдээлэл ихтэй. Эхлэгчдэд харьцангуй ойлгомжтой.</p></div>
+    <div class="card"><h4>Форекс</h4><p>Валютын хос. 24/5 нээлттэй, хөшүүрэг өндөр. Хямд харагддаг ч хөшүүргийн улмаас хурдан хагалдаг.</p></div>
+    <div class="card"><h4>Крипто</h4><p>24/7, маш хэлбэлзэлтэй, зохицуулалт сул. Эрсдэл хамгийн өндөр. Болгоомжтой.</p></div>
+    <div class="card"><h4>Фьючерс</h4><p>Хожимдсон гэрээ (газрын тос, индекс г.м). Хөшүүрэг өндөр, мэргэжлийн орчин.</p></div>
+    <div class="card"><h4>Түүхий эд</h4><p>Алт, мөнгө, нефть. Макро эдийн засаг, нийлүүлэлтэд хүчтэй хамаардаг.</p></div>
+    <div class="card"><h4>Опцион</h4><p>Эрхийн гэрээ. Маш хүчтэй ч маш төвөгтэй. Эхлэгчдэд ОГТ зориулагдаагүй.</p></div>
+  </div>
+  <div class="callout"><p>Нэг зах зээлийг сонгоод <b>гүн судал</b>. Бүгдийг зэрэг хийх гэж бүү оролд. Мастер болоход нэг зах зээл л хангалттай. Олон зах зээл рүү тарах нь анхаарал, мөнгийг тань хоёуланг нь идэх болно.</p></div>
+</div></section>
+
+<!-- 04 -->
+<section id="c4"><div class="wrap">
+  <div class="chap-head">
+    <div class="chap-num">04</div>
+    <div><div class="chap-title">Заавал мэдэх үндсэн ойлголтууд</div>
+    <div class="chap-sub">The vocabulary</div></div>
+  </div>
+  <p class="body">Эдгээр үгсийг чөлөөтэй ойлгохгүйгээр арилжаанд орох нь — дүрэм нь мэдэхгүй тоглоом тоглож байгаатай адил.</p>
+  <div class="term"><strong>Bid / Ask (Үнийн зөрүү · Spread)</strong><span>Bid — худалдан авагчид санал болгож буй үнэ. Ask — худалдагчдын үнэ. Хоорондын зөрүү нь <em>spread</em>. Энэ зөрүү бол далд зардал — орох даруйдаа л чи бага зэрэг алдагдалтай эхэлдэг.</span></div>
+  <div class="term"><strong>Long / Short</strong><span>Long — үнэ өснө гэж найдан худалдан авах. Short — үнэ <em>буурна</em> гэж зээлж зараад дараа нь хямдхан буцааж авах. Тийм, унаж байхад ч ашиг олж болно, гэхдээ short-ийн алдагдал онолын хувьд хязгааргүй.</span></div>
+  <div class="term"><strong>Хөшүүрэг (Leverage)</strong><span>Бага мөнгөөр их хэмжээний позиц барих. 1:100 хөшүүрэг гэдэг нь $100-аар $10,000 хөдөлгөнө гэсэн үг. <em>Хоёр талтай хутга</em> — ашгийг ч, алдагдлыг ч ижил хувиар томруулна. Эхлэгчдийн данс хагалдаг гол шалтгаан энэ.</span></div>
+  <div class="term"><strong>Маржин ба Margin Call</strong><span>Позиц барихад барьцаалагдсан мөнгө. Алдагдал хэт ихсэхэд брокер "нэмж мөнгө хий, эс бөгөөс хаана" гэдэг — энэ нь <em>margin call</em>. Хагалалтын дохио.</span></div>
+  <div class="term"><strong>Захиалгын төрлүүд (Orders)</strong><span><b>Market</b> — одоогийн үнээр шууд. <b>Limit</b> — тогтоосон үнэд хүрвэл. <b>Stop / Stop-loss</b> — алдагдлыг таслах автомат гарц. <b>Take-profit</b> — ашгийг автоматаар авах. Stop-loss-гүй арилжаа бүү хий — хэзээ ч.</span></div>
+  <div class="term"><strong>Likviditet ба Slippage</strong><span>Likviditet — хурдан худалдаж/зарж чадах байдал. Сул likviditet, хурдан зах зээлд таны захиалга хүссэн үнээс өөр үнээр биелдэг — энэ зөрүү нь <em>slippage</em>.</span></div>
+</div></section>
+
+<!-- 05 -->
+<section id="c5"><div class="wrap">
+  <div class="chap-head">
+    <div class="chap-num">05</div>
+    <div><div class="chap-title">Техник анализ</div>
+    <div class="chap-sub">Графикийг унших</div></div>
+  </div>
+  <p class="body">Техник анализ бол үнийн график, өнгөрсөн зан төлвийг судлах арга. <b>Гол үнэн:</b> энэ нь ирээдүйг <em>таамагладаг биш</em>, магадлалыг үнэлдэг. "Энэ хэлбэр гарвал заавал өснө" гэж байдаггүй — зөвхөн "магадлал илүү" гэж байдаг.</p>
+  <div class="grid g2">
+    <div class="card"><h4>Дэмжлэг / Эсэргүүцэл</h4><p>Үнэ дахин дахин эргэдэг түвшин. Хамгийн суурь, хамгийн хүчтэй ойлголт. Үүнийг л сайн ойлгосон арилжаачин аль хэдийн ихийг хийсэн.</p></div>
+    <div class="card"><h4>Чиг хандлага (Trend)</h4><p>Өсөх чиг — улам өндөр оргил, өндөр ёроол. "Чиг хандлага бол найз" — түүний эсрэг бүү тэмц.</p></div>
+    <div class="card"><h4>Лаа (Candlesticks)</h4><p>Тодорхой хугацааны нээх/хаах/дээд/доод үнэ. Зах зээлийн сэтгэл хөдлөлийг харуулна. Эхлээд үндсэн хэдийг л сурвал болно.</p></div>
+    <div class="card"><h4>Эзлэхүүн (Volume)</h4><p>Хэдэн ширхэг арилжаалагдсан. Хөдөлгөөн жинхэнэ эсэхийг батлах хэрэгсэл. Эзлэхүүнгүй өсөлт бол итгэлгүй өсөлт.</p></div>
+    <div class="card"><h4>Хөдөлгөөнт дундаж (MA)</h4><p>Тодорхой хугацааны дундаж үнэ. Чиг хандлага, түвшин харахад тустай. 50, 200 хоног түгээмэл.</p></div>
+    <div class="card"><h4>Индикатор (RSI, MACD)</h4><p>Хэт авалт/худалдааг тоолох туслах хэрэгсэл. <b>Гэхдээ:</b> график дээрээ 7 индикатор тавьбал ороохгүй — энэ бол алдаа.</p></div>
+  </div>
+  <div class="danger"><p>Шинэ арилжаачдын хамгийн түгээмэл алдаа: <b>индикаторын ачаалал.</b> Долоон индикатор зэрэг харж, тус бүр өөр дохио өгөхөд саажиж зогсдог. 1–2 хэрэгсэл сонгож, түүнийгээ гүн ойлго. Энгийн систем тогтвортой ашиглагдвал, нийлмэл систем ашиглагдахгүйгээс хавьгүй дээр.</p></div>
+</div></section>
+
+<!-- 06 -->
+<section id="c6"><div class="wrap">
+  <div class="chap-head">
+    <div class="chap-num">06</div>
+    <div><div class="chap-title">Фундаменталь анализ</div>
+    <div class="chap-sub">Яагаад үнэ хөдөлдөг вэ</div></div>
+  </div>
+  <p class="body">Техник анализ "хэзээ" гэдгийг хэлдэг бол фундаменталь анализ "яагаад" гэдгийг хэлнэ. Энэ нь компанийн орлого, эдийн засгийн өгөгдөл, хүүгийн түвшин, мэдээ зэрэг бодит хүчин зүйлсийг судалдаг.</p>
+  <ul class="clean">
+    <li><b>Хувьцаанд:</b> компанийн орлого, өр, өсөлт, салбарын байдал.</li>
+    <li><b>Форекст:</b> төв банкны хүү, инфляц, ажилгүйдэл, GDP.</li>
+    <li><b>Криптод:</b> технологи, ашиглалт, зохицуулалтын мэдээ, likviditet.</li>
+    <li><b>Мэдээний хуанли:</b> том мэдээ (хүүгийн шийдвэр, ажил эрхлэлт) гарах үед зах зээл огцом хөдөлдөг. Мэдээний цагийг мэдэхгүй арилжаа хийх нь нүд аньж зам гарахтай адил.</li>
+  </ul>
+  <div class="callout"><p>Богино хугацааны арилжаачин ч <b>том мэдээ хэзээ гарахыг</b> заавал мэдэж байх ёстой. Олон шинэ хүн "техник төгс байсан мөртөө гэнэт эсрэг хөдөллөө" гэж гайхдаг — учир нь мэдээ гарсан байдаг. Техник, фундаменталь хоёр өрсөлдөгч биш, хамтрагч.</p></div>
+</div></section>
+
+<!-- 07 -->
+<section id="c7"><div class="wrap">
+  <div class="chap-head">
+    <div class="chap-num">07</div>
+    <div><div class="chap-title">Эрсдэлийн удирдлага</div>
+    <div class="chap-sub">★ Хамгийн чухал бүлэг ★</div></div>
+  </div>
+  <p class="body">Хэрэв чи зөвхөн нэг бүлэг уншина гэвэл <b>энэ нь байх ёстой.</b> Амжилттай арилжаачдыг бусдаас ялгадаг зүйл бол "хаашаа явахыг таах" чадвар биш — <em>буруу таахдаа хэр алддаг</em> вэ гэдэг нь. Зөв таах нь чанд биш, алдагдлаа удирдах нь чанд.</p>
+
+  <div class="callout"><p>Чи 50% л зөв таадаг ч урт хугацаанд ашигтай байж чадна — хэрэв ашиг бүр чинь алдагдлаасаа том бол. Эсрэгээр, 70% зөв таадаг ч эрсдэлээ удирдахгүй бол данс хагална. <b>Зөв байх ≠ ашигтай байх.</b></p></div>
+
+  <p class="body"><b>Алтан дүрэм 1 — Нэг арилжаанд дансныхаа 1–2%-иас илүүг бүү эрсдэл.</b> $1,000 данстай бол нэг арилжаанд $10–20-оос илүү эрсдэхгүй. Энэ нь дараалан 10 удаа алдсан ч амьд үлдэхийг баталгаажуулна.</p>
+
+  <div class="formula">
+    Позицийн хэмжээ = (Данс × Эрсдэл%) ÷ (Орох үнэ − Stop-loss үнэ)<br>
+    <span class="c"># Жишээ: $1000 данс, 2% эрсдэл = $20 эрсдэнэ</span><br>
+    <span class="c"># Орох $100, Stop $95 → 1 нэгжид $5 эрсдэл</span><br>
+    <span class="c"># $20 ÷ $5 = 4 нэгж барина</span>
+  </div>
+
+  <p class="body"><b>Алтан дүрэм 2 — Эрсдэл:Ашгийн харьцаа (R:R) хамгийн багадаа 1:2.</b> $1 эрсдэхдээ $2+ хожих боломжтой арилжаа л хий. Ингэснээр зөвхөн 40% зөв таасан ч ашигтай.</p>
+
+  <!-- Calculator -->
+  <div class="calc">
+    <h4>Позицийн хэмжээ тооцоолуур</h4>
+    <p class="desc">Эрсдэлийн удирдлагыг практик дээр мэдрэхийн тулд тоонуудаа оруул. Энэ бол чиний хамгийн чухал хэрэгсэл.</p>
+    <div class="calc-grid">
+      <div class="field"><label>Дансны хэмжээ ($)</label><input id="acc" type="number" value="1000"></div>
+      <div class="field"><label>Эрсдэл нэг арилжаанд (%)</label><input id="risk" type="number" value="2"></div>
+      <div class="field"><label>Орох үнэ ($)</label><input id="entry" type="number" value="100"></div>
+      <div class="field"><label>Stop-loss үнэ ($)</label><input id="stop" type="number" value="95"></div>
+    </div>
+    <div class="calc-out">
+      <div><div class="k">Эрсдэлд буй мөнгө</div><div class="v risk" id="outRisk">$20.00</div></div>
+      <div><div class="k">Барих хэмжээ</div><div class="v" id="outSize">4.0 нэгж</div></div>
+      <div><div class="k">Позицийн дүн</div><div class="v" id="outVal">$400.00</div></div>
+    </div>
+    <p class="calc-note" id="calcNote">→ Энэ арилжаанд буруу таасан ч зөвхөн дансныхаа 2%-ийг л алдана. Take-profit-ийг орохоосоо 1:2 харьцаагаар тавивал $10 ашиг хайна.</p>
+  </div>
+
+  <ul class="clean ok">
+    <li><b>Stop-loss заавал тавь</b> — позиц нээхээсээ өмнө хаана гарахаа мэдэж бай.</li>
+    <li><b>Stop-loss-оо эсрэг тийш бүү зөө</b> — "одоо эргэнэ" гэдэг найдвар бол данс хагалагч.</li>
+    <li><b>Алдагдсан позицод бүү нэм</b> (averaging down) — энэ бол хамгийн аюултай зуршил.</li>
+    <li><b>Хүлээлтийг тооцоол:</b> Хүлээлт = (Хож% × Дунд ашиг) − (Алд% × Дунд алдагдал).</li>
+  </ul>
+</div></section>
+
+<!-- 08 -->
+<section id="c8"><div class="wrap">
+  <div class="chap-head">
+    <div class="chap-num">08</div>
+    <div><div class="chap-title">Сэтгэл зүй</div>
+    <div class="chap-sub">Жинхэнэ дайсан толинд байна</div></div>
+  </div>
+  <p class="body">Арилжааны 80% нь сэтгэл зүй. Стратеги чинь төгс байсан ч айдас, шунал, найдвар, харамсал чамайг тэр стратегиэ зөрчүүлдэг. Хамгийн сайн систем ч сахилга баггүй гарт нурдаг.</p>
+  <div class="grid g2">
+    <div class="card"><span class="tag">Айдас</span><h4>Ашигтайгаа эрт хаах</h4><p>Бяцхан ашиг гарангуут айж хаагаад, том хөдөлгөөнийг алддаг. Дараа нь харамсдаг.</p></div>
+    <div class="card"><span class="tag">Шунал</span><h4>Хэт их эрсдэл</h4><p>"Энэ удаа их хийе" гэж дүрмээ зөрчиж, нэг арилжаагаар бүгдийг алддаг.</p></div>
+    <div class="card"><span class="tag">Найдвар</span><h4>Алдагдлыг барих</h4><p>Stop-д хүрсэн ч "эргэнэ" гэж барьж, бяцхан алдагдлыг гамшиг болгодог.</p></div>
+    <div class="card"><span class="tag">Өшөө авалт</span><h4>Revenge trading</h4><p>Алдсан мөнгөө "буцааж авах" гэж бодлогогүй орж, улам гүн нүхэнд оруулдаг.</p></div>
+  </div>
+  <div class="callout"><p>Хэдэн алдсаны дараа <b>зогс.</b> Уур, өшөө хорсол, "буцааж авах" сэтгэл төрсөн бол яг тэр мөчид компьютерээ хаа. Зах зээл маргааш ч байх болно. Сахилга бат гэдэг нь "хийх ёстойгоо хийх" биш — <em>хийх ёсгүйг хийхгүй байх</em> чадвар юм.</p></div>
+</div></section>
+
+<!-- 09 -->
+<section id="c9"><div class="wrap">
+  <div class="chap-head">
+    <div class="chap-num">09</div>
+    <div><div class="chap-title">Арилжааны төлөвлөгөө</div>
+    <div class="chap-sub">Систем байхгүй бол мөрийтэй тоглоом</div></div>
+  </div>
+  <p class="body">Тодорхой бичигдсэн төлөвлөгөөгүй арилжаа бол зүгээр л мөрийтэй тоглоом. Сэтгэлийн хөдөлгөөнөөр орох, гарах нь хамгийн хурдан хагалах зам. Төлөвлөгөө чинь дараах асуултуудад тодорхой хариулсан байх ёстой:</p>
+  <ul class="clean">
+    <li><b>Юу арилжаална?</b> Аль зах зээл, аль хэрэгсэл.</li>
+    <li><b>Хэзээ орох вэ?</b> Яг ямар нөхцөл бүрдвэл — тодорхой, давтагдах боломжтой дохио.</li>
+    <li><b>Хэзээ гарах вэ?</b> Stop-loss болон take-profit аль алинд тоо тодорхой.</li>
+    <li><b>Хэр их эрсдэх вэ?</b> Нэг арилжаанд X%, өдөрт хамгийн ихдээ Y алдагдал.</li>
+    <li><b>Хэзээ ОГТ арилжаа хийхгүй вэ?</b> Том мэдээний өмнө, ядарсан, уурласан үед.</li>
+  </ul>
+  <div class="callout"><p>Төлөвлөгөөгөө <b>цаасан дээр бич.</b> Толгойд байгаа төлөвлөгөө бол төлөвлөгөө биш — хүсэл. Бичсэн дүрмийг зөрчихөд илүү хэцүү. Тэгээд тэр дүрмийг <em>10 удаа дараалан зөрчихгүй</em> сахихыг хичээ.</p></div>
+</div></section>
+
+<!-- 10 -->
+<section id="c10"><div class="wrap">
+  <div class="chap-head">
+    <div class="chap-num">10</div>
+    <div><div class="chap-title">Тэмдэглэл ба бэктэст</div>
+    <div class="chap-sub">Хэмжихгүй бол сайжруулж чадахгүй</div></div>
+  </div>
+  <p class="body">Энэ бол бараг хэн ч хийдэггүй, гэхдээ амжилттай хүн бүр хийдэг хэсэг. Энэ нь чамайг сонирхогчоос мэргэжилтэн рүү шилжүүлдэг.</p>
+  <div class="grid g2">
+    <div class="card"><h4>Арилжааны тэмдэглэл</h4><p>Арилжаа бүрээ бичиж тэмд: яагаад орсон, яаж гарсан, тэр үед юу мэдэрсэн. Сар бүр уншиж, давтагддаг алдаагаа ол. Энэ толь чамд хамгийн их үнэн хэлнэ.</p></div>
+    <div class="card"><h4>Бэктэст</h4><p>Стратегиэ өнгөрсөн өгөгдөл дээр шалга. Бодит мөнгө тавихаасаа өмнө "энэ систем урьд нь ажилласан уу?" гэдгийг мэд. Гэхдээ өнгөрсөн нь ирээдүйг батлахгүй гэдгийг бас санах.</p></div>
+  </div>
+  <div class="callout"><p>Тэмдэглэлээ үнэнчээр хөтөл. "Энэ алдаа байсан" гэж хүлээн зөвшөөрөхөд хэцүү, гэхдээ яг тэр үнэнч байдал чамайг хөгжүүлнэ. Олонх хүн алдаагаа "зах зээл буруу" гэж буруутгаад л сайжрахгүй үлддэг.</p></div>
+</div></section>
+
+<!-- 11 -->
+<section id="c11"><div class="wrap">
+  <div class="chap-head">
+    <div class="chap-num">11</div>
+    <div><div class="chap-title">Шинэхэн хүний үхлийн алдаанууд</div>
+    <div class="chap-sub">Энэ жагсаалтыг хадгал</div></div>
+  </div>
+  <p class="body">20 жилийн турш дахин дахин харсан, бараг бүх хагалсан данс эдгээрийн нэг буюу хэдэн алдаанаас үүдсэн:</p>
+  <ul class="clean x">
+    <li><b>Stop-loss тавихгүй байх</b> — нэг муу арилжаа л дансыг устгана.</li>
+    <li><b>Хэт их хөшүүрэг ашиглах</b> — бяцхан хөдөлгөөн данс хагална.</li>
+    <li><b>Нэг арилжаанд хэт их эрсдэх</b> — 1–2% дүрмийг үл тоомсорлох.</li>
+    <li><b>Алдагдсан позицод нэмэх</b> (averaging down) — нүхээ улам гүн ухах.</li>
+    <li><b>Өшөө авах арилжаа</b> — алдсан мөнгөө уураар буцааж авах гэх.</li>
+    <li><b>Бусдын "дохио", "тип" дагах</b> — өөрөө ойлгоогүй зүйлд мөнгө тавих.</li>
+    <li><b>Төлөвлөгөөгүй орох</b> — мэдрэмжээр, FOMO-гоор орох.</li>
+    <li><b>Бодит мөнгөөр шууд эхлэх</b> — демогоор сурахаас өмнө.</li>
+    <li><b>Олон зах зээл, олон стратеги зэрэг туршина</b> — юунд ч мастер болохгүй.</li>
+    <li><b>Хурдан баяжихыг хүсэх</b> — энэ сэтгэлгээ өөрөө бүх алдааны эх үндэс.</li>
+  </ul>
+</div></section>
+
+<!-- 12 -->
+<section id="c12"><div class="wrap">
+  <div class="chap-head">
+    <div class="chap-num">12</div>
+    <div><div class="chap-title">Бодит замын зураг</div>
+    <div class="chap-sub">Яаралгүй, дарааллаар</div></div>
+  </div>
+  <p class="body">Хэрэв чи үнэхээр сурах бол — энэ дараалал нь сар, мөнгөө хамгаална. Алхам алгасах нь данс хагалах хамгийн хурдан зам.</p>
+  <div class="road">
+    <div class="step"><div class="when">1-р алхам · мөнгөгүй</div><h4>Үндсээ сур</h4><p>Энэ сайтан дахь ойлголтуудыг ойлго. Ном унш, график үз. Энэ үе шатанд нэг ч төгрөг бүү тавь.</p></div>
+    <div class="step"><div class="when">2-р алхам · 3–6 сар</div><h4>Демо данс дээр арилжаа хий</h4><p>Виртуал мөнгөөр жинхэнэ зах зээлд дадлага хий. Стратеги бий болго, алдаа гарга — энд алдаа үнэгүй. Демогоор тогтвортой ашигтай болоогүй бол бодит мөнгөнд ОРОХГҮЙ.</p></div>
+    <div class="step"><div class="when">3-р алхам</div><h4>Төлөвлөгөө бич, бэктэст хий</h4><p>Бичигдсэн дүрэмтэй систем гарга. Өнгөрсөн өгөгдөл дээр шалга. Эрсдэлийн дүрмээ тогтоо.</p></div>
+    <div class="step"><div class="when">4-р алхам · тасралтгүй</div><h4>Бүх арилжаагаа тэмдэглэ</h4><p>Демогийн үеэс л тэмдэглэл хөтөл. Алдаагаа ол, засаар.</p></div>
+    <div class="step"><div class="when">5-р алхам · маш бага</div><h4>Жижигхэн бодит мөнгөөр эхэл</h4><p>Алдаж болох бага хэмжээний мөнгөөр эхэл. Зорилго ашиг биш — <b>бодит мөнгөний сэтгэл хөдлөлийг</b> удирдаж сурах. Демо ба бодит хоёр огт өөр мэдрэмж.</p></div>
+    <div class="step"><div class="when">6-р алхам · зөвхөн тогтворжсоны дараа</div><h4>Аажмаар томруул</h4><p>Хэдэн сар дараалан тогтвортой, сахилгатай байж чадсаны дараа л хэмжээгээ нэм. Яаралгүй. Энэ бол спринт биш, марафон.</p></div>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <div class="callout" style="margin-bottom:40px;text-align:center">
+    <p style="margin-bottom:20px">Онол хангалттай. Одоо <b>эрсдэлгүй дадлага</b> хий — $10,000 виртуал мөнгөтэй демо терминал дээр stop-loss, эрсдэлийн удирдлага, сахилга багаа төлөвшүүл.</p>
+    <a href="demo-terminal.html" style="display:inline-block;background:var(--amber);color:var(--ink);text-decoration:none;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;padding:15px 30px;border-radius:11px">Демо терминал нээх →</a>
+  </div>
+  <div class="disclaimer">
+    <h4>Шударга мэдэгдэхүүн</h4>
+    <p>Энэ сайт бол боловсролын зорилготой. Санхүүгийн, хөрөнгө оруулалтын зөвлөгөө биш. Арилжаа нь хөрөнгөө бүрэн алдах эрсдэлтэй бөгөөд олонх хүн мөнгөө алддаг. Зөвхөн алдаж болох мөнгөө л арилж бол. Аливаа шийдвэрийг өөрийн судалгаа, эсвэл лицензтэй мэргэжилтний зөвлөгөөн дээр үндэслэ. Энд "баяжина" гэсэн ямар ч амлалт өгөөгүй — учир нь өгч болохгүй.</p>
+  </div>
+  <p class="sig">"Хамгийн сайн арилжаачид нь хамгийн сайн таагч биш — хамгийн сайн <b>амьд үлдэгчид</b> юм. Эхлээд амьд үлд. Дараа нь ашгийн тухай ярина."</p>
+</div></footer>
+
+<script>
+  const ids=['acc','risk','entry','stop'];
+  const f=id=>parseFloat(document.getElementById(id).value)||0;
+  const fmt=n=>'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  function calc(){
+    const acc=f('acc'),risk=f('risk'),entry=f('entry'),stop=f('stop');
+    const riskMoney=acc*risk/100;
+    const perUnit=Math.abs(entry-stop);
+    const size=perUnit>0?riskMoney/perUnit:0;
+    const posVal=size*entry;
+    document.getElementById('outRisk').textContent=fmt(riskMoney);
+    document.getElementById('outSize').textContent=(size).toLocaleString('en-US',{maximumFractionDigits:2})+' нэгж';
+    document.getElementById('outVal').textContent=fmt(posVal);
+    const tp=entry+perUnit*2*(entry>=stop?1:-1);
+    const note=document.getElementById('calcNote');
+    if(perUnit<=0){note.textContent='→ Орох ба stop-loss үнэ ялгаатай байх ёстой. Stop-loss-гүй бол эрсдэлээ хэмжих боломжгүй.';}
+    else{note.textContent=`→ Буруу таасан ч зөвхөн дансныхаа ${risk}% (${fmt(riskMoney)})-ийг л алдана. 1:2 харьцаагаар take-profit-ийг ~${fmt(tp)}-д тавивал ${fmt(riskMoney*2)} ашиг хайна.`;}
+  }
+  ids.forEach(id=>document.getElementById(id).addEventListener('input',calc));
+  calc();
+
+  // smooth active toc
+  const links=[...document.querySelectorAll('nav.toc a')];
+  const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){
+    links.forEach(l=>l.style.color='');links.forEach(l=>l.style.background='');
+    const a=document.querySelector('nav.toc a[href="#'+e.target.id+'"]');
+    if(a){a.style.color='var(--amber)';a.style.background='var(--panel)';}
+  }})},{rootMargin:'-40% 0px -55% 0px'});
+  document.querySelectorAll('section').forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>
