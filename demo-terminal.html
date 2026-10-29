@@ -121,6 +121,24 @@
   .drawhint b{color:var(--amber)}
   .drawhint .w{color:var(--red)}
 
+  /* mode toggle: Симуляци / Бодит үнэ */
+  .modebar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0 10px}
+  .modetoggle{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--ink-2)}
+  .modetoggle button{border:none;background:none;color:var(--cream-dim);padding:10px 20px;min-height:44px;
+    font-family:'Manrope',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;transition:.2s}
+  .modetoggle button:hover{color:var(--cream)}
+  .modetoggle button.on[data-mode="sim"]{background:var(--amber);color:var(--ink)}
+  .modetoggle button.on[data-mode="real"]{background:var(--green);color:#06120a}
+  .modenote{font-family:'JetBrains Mono',monospace;font-size:.64rem;color:var(--muted);line-height:1.5}
+  .legend .realtag{font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--green);
+    border:1px solid var(--green-d);border-radius:4px;padding:1px 5px;margin-left:4px}
+  .legend .stale{color:var(--amber)}
+  .ctl-off{opacity:.35}
+  @media(max-width:600px){
+    .modetoggle{width:100%}
+    .modetoggle button{flex:1;padding:13px 8px;font-size:.95rem}
+  }
+
   /* order ticket */
   .ticket{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;height:fit-content}
   .ticket h3{font-family:'Spectral',serif;font-size:1.1rem;font-weight:700;margin-bottom:4px}
@@ -306,7 +324,14 @@
       <span class="btn" id="sessionTimer" title="Сессийн хугацаа">⏱ 00:00</span>
     </div>
   </div>
-  <div class="simbar" role="note">
+  <div class="modebar">
+    <div class="modetoggle" id="modeToggle" role="group" aria-label="Үнийн горим">
+      <button data-mode="sim" class="on">◎ Симуляци</button>
+      <button data-mode="real">● Бодит үнэ</button>
+    </div>
+    <span class="modenote" id="modeNote">Санамсаргүй үнэ · хязгааргүй, аюулгүй дадлага</span>
+  </div>
+  <div class="simbar" role="note" id="simbar">
     <b>⚠ Зөвхөн симуляци</b>
     <span>Бүх үнэ зохиомол. Энд хийсэн арилжаа <b>бодит мөнгөнд шилждэггүй</b>, бодит зах зээлийн үр дүнг ч илэрхийлэхгүй.</span>
   </div>
@@ -339,7 +364,7 @@
         <div class="tfbar" id="tfbar">
           <button data-tf="1" class="on">1m</button><button data-tf="5">5m</button><button data-tf="15">15m</button><button data-tf="60">1H</button><button data-tf="240">4H</button>
         </div>
-        <span class="tf-note">Симуляцийн цаг: 1 минут ≈ 5 сек (1×)</span>
+        <span class="tf-note" id="tfNote">Симуляцийн цаг: 1 минут ≈ 5 сек (1×)</span>
       </div>
       <div class="chart-body">
         <div class="tools" id="tools">
@@ -439,7 +464,7 @@
     <h2>Тавтай морил. Энэ бол дадлагын талбар.</h2>
     <p class="sub">Чамд <b>$10,000 виртуал мөнгө</b> өгсөн. Жинхэнэ мөнгө биш — энд алдах нь үнэгүй, харин сурах нь үнэтэй. Зорилго: бодит мөнгө тавихаасаа өмнө эрсдэлийн мэдрэмж, сахилга баг олж авах.</p>
     <div class="steps">
-      <div class="stp"><div class="n">1</div><div class="tx"><b>Хэрэгсэл сонго.</b> Дээд талын табаас EUR/USD, алт, BTC, эсвэл Apple-ийг сонгоно. График нь жинхэнэ юм шиг хөдөлдөг симуляц.</div></div>
+      <div class="stp"><div class="n">1</div><div class="tx"><b>Хэрэгсэл сонго.</b> Дээд талын табаас EUR/USD, алт, BTC, эсвэл Apple-ийг сонгоно. График нь жинхэнэ юм шиг хөдөлдөг симуляц. Дээд талын <b>«Бодит үнэ»</b> товчоор алт, BTC, ETH, EUR-ийн бодит цагийн үнэ рүү шилжиж болно — данс нь виртуал хэвээр.</div></div>
       <div class="stp"><div class="n">2</div><div class="tx"><b>Эрсдэлээ тооцоол.</b> Stop Loss үнэ оруулаад "Лот тооц" дарвал, дансныхаа зөвхөн 1–2%-ийг эрсдэх лотыг өөрөө бодож өгнө. <b>Энэ зуршлыг эндээс эхэл.</b></div></div>
       <div class="stp"><div class="n">3</div><div class="tx"><b>Арилжаа хий.</b> Ногоон <b>Авах</b> (өснө гэвэл) эсвэл улаан <b>Зарах</b> (буурна гэвэл) товч дар. Stop Loss / Take Profit тавьвал автоматаар хаагдана.</div></div>
       <div class="stp"><div class="n">4</div><div class="tx"><b>Графикаа унш.</b> 1m–4H timeframe сольж, volume ба лааг хамт хар. Зүүн талын хэрэгслээр дэмжлэг/эсэргүүцэл, трэнд, Фибоначчи түвшнээ тэмдэглэ — TradingView, MetaTrader дээр яг ийм хэрэгсэл байдаг.</div></div>
@@ -484,10 +509,14 @@ const MAX_BASE=240*125, TICKS_PER_CANDLE=7, START_BAL=10000, STOPOUT=40; // marg
 const MIN=60000;
 
 /* ---------- Төлөв ---------- */
-let state={ balance:START_BAL, positions:[], pending:[], history:[], curve:[START_BAL], nextId:1 };
+function freshAcct(){ return { balance:START_BAL, positions:[], pending:[], history:[], curve:[START_BAL], nextId:1 }; }
+// Горим бүр өөрийн данстай: симуляцийн үнээр нээсэн позицийг бодит үнээр үнэлж болохгүй
+const accts={sim:freshAcct(), real:freshAcct()};
+let mode='sim', state=accts.sim;
 let sel='EURUSD', orderType='market', tf=1;
 let running=true, speed=1, baseInterval=720, timer=null, tickCount=0;
 let live={}; // sym -> {mid, candles:[{t,o,h,l,c,v}] (1m), cur:{t,o,h,l,c,v}}
+let liveSim=live;
 
 // Арилжааны идэвх цагаас хамаарна: Лондон (~09 UTC), Нью-Йорк (~14:30 UTC) нээгдэхэд хэлбэлзэл, volume өснө
 function activity(t){
@@ -531,7 +560,11 @@ function tick(){
   checkPending(); checkSLTP(); checkStopout();
   render();
 }
-function quote(k){ const s=SYMS[k],L=live[k]; return {bid:L.mid - s.spread/2, ask:L.mid + s.spread/2}; }
+function quote(k){
+  const s=SYMS[k],L=live[k];
+  if(mode==='real') return {bid:L.bid, ask:L.ask};   // Binance-ийн бодит bid/ask
+  return {bid:L.mid - s.spread/2, ask:L.mid + s.spread/2};
+}
 
 /* ---------- Позиц ---------- */
 function notionalOf(p){ return p.lots*SYMS[p.sym].contract*live[p.sym].mid; }
@@ -553,6 +586,7 @@ function readSLTP(open,dir){
   return {sl,tp};
 }
 function openTrade(dir){
+  if(mode==='real'&&!live[sel].ok){ toast('Бодит үнэ хараахан ачаалагдаагүй байна.','bad'); return; }
   const s=SYMS[sel], q=quote(sel);
   let lots=parseFloat(document.getElementById('vol').value);
   if(!(lots>0)){ toast('Эзлэхүүн буруу байна.','bad'); return; }
@@ -650,25 +684,31 @@ function render(){
   $('aFloat').textContent=money(fl); $('aFloat').className='val '+(fl>0?'up':fl<0?'down':'');
 
   // symbol tabs
-  const st=$('symtabs');
-  if(st.children.length!==KEYS.length){
-    st.innerHTML=KEYS.map(k=>`<div class="symtab" data-k="${k}"><span class="s">${k}</span><span class="p" id="tabp_${k}"></span></div>`).join('');
-    [...st.children].forEach(el=>el.onclick=()=>{sel=el.dataset.k; draft=null; selId=null; resetTicket(); render();});
+  const st=$('symtabs'), keys=modeKeys();
+  if(st.dataset.mode!==mode){
+    st.dataset.mode=mode;
+    st.innerHTML=keys.map(k=>`<div class="symtab" data-k="${k}"><span class="s">${k}</span><span class="p" id="tabp_${k}"></span></div>`).join('');
+    [...st.children].forEach(el=>el.onclick=()=>{ sel=el.dataset.k; draft=null; selId=null; resetTicket(); render(); onRealView(); });
   }
-  KEYS.forEach(k=>{ $('tabp_'+k).textContent=fmt(live[k].mid,SYMS[k].dec); });
+  keys.forEach(k=>{ $('tabp_'+k).textContent=live[k].mid==null?'…':fmt(live[k].mid,SYMS[k].dec); });
   [...st.children].forEach(el=>el.classList.toggle('on', el.dataset.k===sel));
 
   // chart head + ticket prices
-  const s=SYMS[sel], q=quote(sel);
-  $('chSym').textContent=s.name;
-  $('chBid').textContent=fmt(q.bid,s.dec); $('chAsk').textContent=fmt(q.ask,s.dec);
-  $('chSpread').textContent=fmt(s.spread, s.dec);
-  const base=live[sel].candles, ref=base[Math.max(0,base.length-1440)].c, ch=live[sel].mid-ref, sg=ch>=0?'+':'';
-  $('chChg').textContent=`${sg}${fmt(ch,s.dec)} (${sg}${(ch/ref*100).toFixed(2)}%)`;
-  $('chChg').className='q '+(ch>=0?'up':'down');
-  $('sellP').textContent=fmt(q.bid,s.dec); $('buyP').textContent=fmt(q.ask,s.dec);
+  const s=SYMS[sel], q=quote(sel), L=live[sel], has=L.mid!=null;
+  const px=v=>has?fmt(v,s.dec):'…';
+  $('chSym').textContent=mode==='real'?REAL[sel].name:s.name;
+  $('chBid').textContent=px(q.bid); $('chAsk').textContent=px(q.ask);
+  $('chSpread').textContent=mode==='real'?px(q.ask-q.bid):fmt(s.spread, s.dec);
+  let ref=null;
+  if(mode==='real') ref=L.o24; else ref=L.candles[Math.max(0,L.candles.length-1440)].c;
+  if(has&&ref){
+    const ch=L.mid-ref, sg=ch>=0?'+':'';
+    $('chChg').textContent=`${sg}${fmt(ch,s.dec)} (${sg}${(ch/ref*100).toFixed(2)}%)`;
+    $('chChg').className='q '+(ch>=0?'up':'down');
+  } else { $('chChg').textContent='…'; $('chChg').className='q'; }
+  $('sellP').textContent=px(q.bid); $('buyP').textContent=px(q.ask);
   const lots=parseFloat($('vol').value)||0;
-  $('notional').textContent=`1 лот = ${fmt(s.contract,0)} нэгж · хөшүүрэг 1:${s.lev} · энэ захиалгын маржин ≈ ${money(lots*s.contract*live[sel].mid/s.lev)}`;
+  $('notional').textContent=`1 лот = ${fmt(s.contract,0)} нэгж · хөшүүрэг 1:${s.lev} · энэ захиалгын маржин ≈ ${money(lots*s.contract*(L.mid||0)/s.lev)}`;
 
   drawChart();
   renderTable();
@@ -686,15 +726,18 @@ let G=null;                         // сүүлд зурсан графикий�
 let hover=null;                     // {x,y} хулганы байрлал
 let aggVer=0, aggCache={key:'',groups:null};
 let tool='cursor', draft=null, selId=null, drawSeq=0;
-const drawings={}; KEYS.forEach(k=>drawings[k]=[]);
+// Горим бүрийн зураг тусдаа (үнийн түвшин нь өөр) — горим солиход хадгалагдана
+const drawSets={sim:{},real:{}}; KEYS.forEach(k=>{ drawSets.sim[k]=[]; drawSets.real[k]=[]; });
+let drawings=drawSets.sim;
 
 function p2(n){ return String(n).padStart(2,'0'); }
 function tfLabel(m){ return m<60?m+'m':(m/60)+'H'; }
 function fmtT(t){ const d=new Date(t), hm=p2(d.getHours())+':'+p2(d.getMinutes()); return tf>=60?p2(d.getMonth()+1)+'/'+p2(d.getDate())+' '+hm:hm; }
-function fmtVol(v){ return v>=1e6?(v/1e6).toFixed(2)+'M':v>=1e3?(v/1e3).toFixed(2)+'K':String(v); }
+function fmtVol(v){ return v>=1e6?(v/1e6).toFixed(2)+'M':v>=1e3?(v/1e3).toFixed(2)+'K':v>=10?v.toFixed(0):v.toFixed(2); }
 
 // 1 минутын лаануудыг сонгосон timeframe руу нэгтгэх (сүүлийн n лаа)
 function groupsFor(k,m,n){
+  if(mode==='real') return (live[k].tfc[m]||[]).slice(-n);   // Binance өөрөө timeframe-ээр өгнө
   const key=k+'|'+m+'|'+n+'|'+aggVer;
   if(aggCache.key===key) return aggCache.groups;
   const L=live[k], ms=m*MIN, out=[];
@@ -723,6 +766,13 @@ function drawChart(){
   const mainH=h-padT-axisH, plotH=mainH*0.78, volTop=padT+mainH*0.8, volH=mainH*0.2, bottom=padT+mainH;
   const RIGHT=4, n=Math.max(30,Math.min(110,Math.round(plotW/10)));
   const groups=groupsFor(sel,tf,n), ms=tf*MIN, off=n-groups.length;
+  if(!groups.length){
+    G=null;
+    ctx.fillStyle='#80776a'; ctx.font='12px "JetBrains Mono", monospace'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('Бодит үнэ ачааллаж байна…', w/2, h/2);
+    $('legend').innerHTML=`<div><b>${REAL[sel]?REAL[sel].name:s.name}</b> · ${tfLabel(tf)} <span class="realtag">● Бодит үнэ</span></div>`;
+    return;
+  }
   const cw=plotW/(n+RIGHT), bw=Math.max(1.5,cw*0.64);
   const t0=groups[0].t-off*ms;
 
@@ -814,7 +864,9 @@ function drawChart(){
   const c=groups[hIdx], prev=groups[hIdx-1], base=prev?prev.c:c.o, ch=c.c-base, sg=ch>=0?'+':'';
   const cls=c.c>=c.o?'up':'down', f=v=>`<span class="${cls}">${fmt(v,s.dec)}</span>`;
   $('legend').innerHTML=
-    `<div><b>${s.name}</b> · ${tfLabel(tf)} <span class="sim">Симуляц</span></div>`+
+    (mode==='real'
+      ? `<div><b>${REAL[sel].name}</b> · ${tfLabel(tf)} <span class="realtag">● Бодит үнэ</span> · Binance ${REAL[sel].bin}${liveAge()}</div>`
+      : `<div><b>${s.name}</b> · ${tfLabel(tf)} <span class="sim">Симуляц</span></div>`)+
     `<div><i>O ${f(c.o)}</i><i>H ${f(c.h)}</i><i>L ${f(c.l)}</i><i>C ${f(c.c)}</i><i class="${ch>=0?'up':'down'}">${sg}${fmt(ch,s.dec)} (${sg}${(ch/base*100).toFixed(2)}%)</i></div>`+
     `<div>Vol <span class="${cls}">${fmtVol(c.v)}</span></div>`;
 }
@@ -896,7 +948,10 @@ function setTool(t){
   document.querySelectorAll('#tools [data-tool]').forEach(b=>b.classList.toggle('on',b.dataset.tool===t));
   cv.style.touchAction=t==='cursor'?'pan-y':'none';
   const hint=$('drawHint');
-  hint.innerHTML=t==='cursor'?'':HINTS[t]+' · <b>Esc</b> — цуцлах<br><span class="w">⚠ Симуляц — зурсан түвшин бодит зах зээлийн дохио биш.</span>';
+  const warn=mode==='real'
+    ? '⚠ Бодит үнэ дээр зурж байна — гэхдээ зурсан түвшин арилжааны дохио биш, данс виртуал.'
+    : '⚠ Симуляц — зурсан түвшин бодит зах зээлийн дохио биш.';
+  hint.innerHTML=t==='cursor'?'':HINTS[t]+' · <b>Esc</b> — цуцлах<br><span class="w">'+warn+'</span>';
   hint.classList.toggle('show',t!=='cursor');
   drawChart();
 }
@@ -951,7 +1006,7 @@ $('tools').addEventListener('click',e=>{
 [...$('tfbar').children].forEach(b=>b.onclick=()=>{
   tf=+b.dataset.tf; draft=null;
   [...$('tfbar').children].forEach(x=>x.classList.toggle('on',x===b));
-  drawChart();
+  drawChart(); onRealView();
 });
 function line(val,col,label,y,plotW,padR,dash){
   const gy=y(val); ctx.strokeStyle=col; ctx.lineWidth=1;
@@ -1063,16 +1118,151 @@ function drawEquity(){
   ctx.fillText('$'+fmt(last,0), w-padR+6, y(last));
 }
 
+/* ---------- Бодит үнэ (Binance нийтийн API — түлхүүргүй, CORS нээлттэй) ----------
+   Binance дээр XAU/USD, EUR/USD шууд байхгүй тул ойролцоо хослол ашиглана:
+   PAXG = 1 трой унц алтаар баталгаажсан токен, EUR/USDT ≈ EUR/USD. */
+const REAL={
+  XAUUSD:{bin:'PAXGUSDT', name:'XAU/USD алт (PAXG)'},
+  BTCUSD:{bin:'BTCUSDT',  name:'BTC/USDT'},
+  ETHUSD:{bin:'ETHUSDT',  name:'ETH/USDT'},
+  EURUSD:{bin:'EURUSDT',  name:'EUR/USDT'},
+};
+const REAL_KEYS=Object.keys(REAL);
+const BIN_TO_KEY={}; REAL_KEYS.forEach(k=>BIN_TO_KEY[REAL[k].bin]=k);
+const BIN_HOSTS=['https://data-api.binance.vision','https://api.binance.com'];
+const WS_HOSTS=['wss://data-stream.binance.vision','wss://stream.binance.com:9443'];
+const BIN_IV={1:'1m',5:'5m',15:'15m',60:'1h',240:'4h'};
+const KLINE_TTL=60000, POLL_MS=10000;
+const liveReal={};
+REAL_KEYS.forEach(k=>liveReal[k]={mid:null,bid:null,ask:null,o24:null,ok:false,last:0,tfc:{},fetched:{}});
+const selBy={sim:'EURUSD', real:'XAUUSD'};
+let ws=null, wsHost=0, wsRetry=0, pollT=null, pollFails=0, rq=null;
+
+function modeKeys(){ return mode==='real'?REAL_KEYS:KEYS; }
+function liveAge(){
+  const age=Date.now()-live[sel].last;
+  return age<15000?'':` <span class="stale">· ${Math.round(age/1000)} сек хоцорсон</span>`;
+}
+
+async function binGet(path){
+  for(const h of BIN_HOSTS){
+    const ac=new AbortController(), to=setTimeout(()=>ac.abort(),8000);
+    try{ const r=await fetch(h+path,{signal:ac.signal,cache:'no-store'}); if(r.ok) return await r.json(); }
+    catch(e){} finally{ clearTimeout(to); }
+  }
+  throw new Error('Binance unreachable');
+}
+async function loadKlines(k,m,force){
+  const L=liveReal[k];
+  if(!force&&L.tfc[m]&&Date.now()-L.fetched[m]<KLINE_TTL) return;
+  const rows=await binGet(`/api/v3/klines?symbol=${REAL[k].bin}&interval=${BIN_IV[m]}&limit=200`);
+  L.tfc[m]=rows.map(r=>({t:r[0],o:+r[1],h:+r[2],l:+r[3],c:+r[4],v:+r[5]}));
+  L.fetched[m]=Date.now();
+}
+function applyBook(k,bid,ask){
+  const L=liveReal[k]; L.bid=bid; L.ask=ask; L.mid=(bid+ask)/2; L.ok=true; L.last=Date.now();
+}
+async function loadTickers(){
+  const q=encodeURIComponent(JSON.stringify(REAL_KEYS.map(k=>REAL[k].bin)));
+  const [t24,book]=await Promise.all([binGet('/api/v3/ticker/24hr?symbols='+q), binGet('/api/v3/ticker/bookTicker?symbols='+q)]);
+  t24.forEach(t=>{ const k=BIN_TO_KEY[t.symbol]; if(k) liveReal[k].o24=+t.openPrice; });
+  book.forEach(b=>{ const k=BIN_TO_KEY[b.symbol]; if(k) applyBook(k,+b.bidPrice,+b.askPrice); });
+}
+
+// WebSocket: бүх хэрэгслийн bid/ask + 24ц, сонгосон хэрэгслийн лаа
+function openWS(){
+  closeWS();
+  const streams=REAL_KEYS.flatMap(k=>{ const b=REAL[k].bin.toLowerCase(); return [b+'@bookTicker', b+'@miniTicker']; });
+  streams.push(REAL[sel].bin.toLowerCase()+'@kline_'+BIN_IV[tf]);
+  let sock;
+  try{ sock=new WebSocket(WS_HOSTS[wsHost%WS_HOSTS.length]+'/stream?streams='+streams.join('/')); }
+  catch(e){ startPoll(); return; }
+  ws=sock;
+  sock.onopen=()=>{ if(ws===sock){ wsRetry=0; stopPoll(); } };
+  sock.onmessage=e=>{ if(ws===sock) onWsMsg(JSON.parse(e.data)); };
+  sock.onclose=()=>{
+    if(ws!==sock||mode!=='real') return;
+    ws=null; wsRetry++; wsHost++; startPoll();          // тасарвал REST-ээр үргэлжлүүлж, дахин холбогдоно
+    if(wsRetry<=5) setTimeout(()=>{ if(mode==='real'&&!ws) openWS(); }, Math.min(30000,2000*wsRetry));
+  };
+}
+function closeWS(){ if(ws){ const s=ws; ws=null; s.onclose=null; s.close(); } }
+function onWsMsg(m){
+  const d=m.data, k=d&&BIN_TO_KEY[d.s]; if(!k) return;
+  if(m.stream.endsWith('@bookTicker')) applyBook(k,+d.b,+d.a);
+  else if(d.e==='24hrMiniTicker') liveReal[k].o24=+d.o;
+  else if(d.e==='kline'&&k===sel&&d.k.i===BIN_IV[tf]){
+    const arr=liveReal[k].tfc[tf]; if(!arr) return;
+    const c={t:d.k.t,o:+d.k.o,h:+d.k.h,l:+d.k.l,c:+d.k.c,v:+d.k.v};
+    if(arr.length&&arr[arr.length-1].t===c.t) arr[arr.length-1]=c;
+    else if(!arr.length||c.t>arr[arr.length-1].t){ arr.push(c); if(arr.length>300) arr.shift(); }
+  }
+  scheduleRender();
+}
+// Мессеж олон ирдэг (BTC секундэд хэдэн арав) — дэлгэцийг 0.4 сек тутамд л шинэчилнэ
+function scheduleRender(){
+  if(rq) return;
+  rq=setTimeout(()=>{ rq=null; if(mode!=='real') return; checkPending(); checkSLTP(); checkStopout(); render(); },400);
+}
+function startPoll(){ if(pollT) return; pollT=setInterval(pollOnce,POLL_MS); }
+function stopPoll(){ clearInterval(pollT); pollT=null; pollFails=0; }
+async function pollOnce(){
+  try{ await loadTickers(); await loadKlines(sel,tf,true); pollFails=0; scheduleRender(); }
+  catch(e){ if(++pollFails>=3) failReal(); }
+}
+function failReal(){
+  toast('Бодит үнэ ачааллахад алдаа гарлаа — Симуляци горим руу буцлаа.','bad',5000);
+  setMode('sim');
+}
+// Бодит горимд хэрэгсэл/timeframe солиход: лааг (кэштэй) ачаалж, WebSocket-ийн лааны урсгалыг солино
+function onRealView(){
+  if(mode!=='real') return;
+  openWS();
+  loadKlines(sel,tf).then(()=>{ if(mode==='real') render(); }).catch(()=>toast('График ачааллахад алдаа гарлаа.','bad'));
+}
+
+function updateModeUI(){
+  const real=mode==='real';
+  [...$('modeToggle').children].forEach(b=>b.classList.toggle('on',b.dataset.mode===mode));
+  $('modeNote').textContent=real
+    ? 'Binance-ийн бодит цагийн үнэ · алт = PAXG, евро = EUR/USDT (ойролцоо хослол) · данс виртуал'
+    : 'Санамсаргүй үнэ · хязгааргүй, аюулгүй дадлага';
+  $('simbar').innerHTML=real
+    ? '<b>⚠ Бодит үнэ · зөвхөн үзүүлэн</b><span>Бодит зах зээлийн үнэ ашиглаж байна. Данс виртуал — <b>бодит мөнгөөр арилжаа хийгдэхгүй</b>.</span>'
+    : '<b>⚠ Зөвхөн симуляци</b><span>Бүх үнэ зохиомол. Энд хийсэн арилжаа <b>бодит мөнгөнд шилждэггүй</b>, бодит зах зээлийн үр дүнг ч илэрхийлэхгүй.</span>';
+  $('tfNote').textContent=real?'Binance · бодит цаг':'Симуляцийн цаг: 1 минут ≈ 5 сек (1×)';
+  [$('playBtn'),$('speeds')].forEach(el=>el.classList.toggle('ctl-off',real));
+}
+async function setMode(m){
+  if(m===mode) return;
+  selBy[mode]=sel;
+  mode=m; state=accts[m]; drawings=drawSets[m]; sel=selBy[m];
+  live=m==='real'?liveReal:liveSim;
+  draft=null; selId=null; hover=null;
+  updateModeUI(); setTool('cursor');
+  if(m==='sim'){ closeWS(); stopPoll(); startLoop(); resetTicket(); render(); return; }
+  clearInterval(timer);
+  toast('Бодит зах зээлийн үнэ ашиглаж байна. Энэ нь зөвхөн үзүүлэн. Бодит мөнгөөр арилжаа хийхгүй.','',5000);
+  resetTicket(); render();
+  try{
+    await loadTickers(); await loadKlines(sel,tf);
+    if(mode!=='real') return;
+    openWS(); render();
+  }catch(e){ if(mode==='real') failReal(); }
+}
+[...$('modeToggle').children].forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
+function realOnly(){ toast('Бодит горимд үнэ бодит цагаар явна — зогсоох, хурдлуулах боломжгүй.'); }
+
 /* ---------- Toast ---------- */
 let toastT;
-function toast(msg,kind){ const t=$('toast'); t.textContent=msg; t.className='show '+(kind||''); clearTimeout(toastT); toastT=setTimeout(()=>t.className=t.className.replace('show',''),2600); }
+function toast(msg,kind,ms){ const t=$('toast'); t.textContent=msg; t.className='show '+(kind||''); clearTimeout(toastT); toastT=setTimeout(()=>t.className=t.className.replace('show',''),ms||2600); }
 
 /* ---------- Engine control ---------- */
-function startLoop(){ clearInterval(timer); if(running) timer=setInterval(tick, baseInterval/speed); }
-$('playBtn').onclick=()=>{ running=!running; $('playBtn').textContent=running?'⏸ Зогсоох':'▶ Үргэлжлүүлэх'; $('playBtn').classList.toggle('on',!running); startLoop(); };
-[...$('speeds').children].forEach(b=>b.onclick=()=>{ speed=+b.dataset.s; [...$('speeds').children].forEach(x=>x.classList.toggle('on',x===b)); startLoop(); });
-$('resetBtn').onclick=async()=>{ if(!confirm('Демо дансыг $10,000 болгож шинэчлэх үү? Түүх, позиц бүгд устана.'))return;
-  state={balance:START_BAL,positions:[],pending:[],history:[],curve:[START_BAL],nextId:1}; await persist(); render(); toast('Данс шинэчлэгдлээ · $10,000','good'); };
+function startLoop(){ clearInterval(timer); if(running&&mode==='sim') timer=setInterval(tick, baseInterval/speed); }
+$('playBtn').onclick=()=>{ if(mode==='real') return realOnly(); running=!running; $('playBtn').textContent=running?'⏸ Зогсоох':'▶ Үргэлжлүүлэх'; $('playBtn').classList.toggle('on',!running); startLoop(); };
+[...$('speeds').children].forEach(b=>b.onclick=()=>{ if(mode==='real') return realOnly(); speed=+b.dataset.s; [...$('speeds').children].forEach(x=>x.classList.toggle('on',x===b)); startLoop(); });
+$('resetBtn').onclick=async()=>{ if(!confirm((mode==='real'?'Бодит үнийн':'Симуляцийн')+' демо дансыг $10,000 болгож шинэчлэх үү? Түүх, позиц бүгд устана.'))return;
+  state=accts[mode]=freshAcct(); await persist(); render(); toast('Данс шинэчлэгдлээ · $10,000','good'); };
 
 document.querySelectorAll('.ltab').forEach(t=>t.onclick=()=>{ ledgerView=t.dataset.v;
   document.querySelectorAll('.ltab').forEach(x=>x.classList.toggle('on',x===t)); renderTable(); });
@@ -1123,6 +1313,7 @@ document.addEventListener('keydown',e=>{
     [...state.positions].forEach(p=>closeTrade(p.id,true));
     toast('Бүх позиц хаагдлаа.','good'); persist(); render();
   }
+  else if(mode==='real'&&(e.key===' '||e.code==='Space'||e.key==='1'||e.key==='2'||e.key==='4')){ e.preventDefault(); realOnly(); }
   else if(e.key===' '||e.code==='Space'){
     e.preventDefault();
     running=!running;
@@ -1149,13 +1340,17 @@ $('helpBtn').onclick=()=>$('onboard').classList.add('show');
 $('startBtn').onclick=async()=>{ $('onboard').classList.remove('show'); await store.set('demoSeen',true); };
 $('onboard').addEventListener('click',e=>{ if(e.target===$('onboard')) $('onboard').classList.remove('show'); });
 
-async function persist(){ await store.set('demoAcct', {balance:state.balance, history:state.history, curve:state.curve, nextId:state.nextId}); }
+const ACCT_KEY={sim:'demoAcct', real:'demoAcctReal'};
+async function persist(){ await store.set(ACCT_KEY[mode], {balance:state.balance, history:state.history, curve:state.curve, nextId:state.nextId}); }
 
 /* ---------- Boot ---------- */
 (async function(){
   initLive();
-  const saved=await store.get('demoAcct');
-  if(saved && typeof saved.balance==='number'){ state.balance=saved.balance; state.history=saved.history||[]; state.curve=saved.curve&&saved.curve.length?saved.curve:[state.balance]; state.nextId=saved.nextId||1; }
+  for(const m of ['sim','real']){
+    const saved=await store.get(ACCT_KEY[m]), a=accts[m];
+    if(saved && typeof saved.balance==='number'){ a.balance=saved.balance; a.history=saved.history||[]; a.curve=saved.curve&&saved.curve.length?saved.curve:[a.balance]; a.nextId=saved.nextId||1; }
+  }
+  // Анх үргэлж Симуляци горимоор нээгдэнэ
   resetTicket(); render(); startLoop();
   const seen=await store.get('demoSeen');
   if(!seen) $('onboard').classList.add('show');
