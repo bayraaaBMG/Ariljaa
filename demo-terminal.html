@@ -81,11 +81,45 @@
     padding:14px 14px 8px;position:relative;min-height:420px;display:flex;flex-direction:column}
   .chart-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px}
   .chart-head .sym{font-family:'Spectral',serif;font-weight:700;font-size:1.4rem}
-  .chart-head .quote{display:flex;gap:18px;align-items:baseline}
+  .chart-head .quote{display:flex;gap:18px;align-items:baseline;flex-wrap:wrap}
   .chart-head .quote .q{font-family:'JetBrains Mono',monospace;font-size:1.05rem;font-weight:700}
   .chart-head .quote small{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted);
     display:block;text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px}
-  canvas{width:100%;flex:1;display:block;border-radius:8px}
+  canvas{display:block}
+
+  /* chart toolbar · drawing tools · legend */
+  .chart-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+  .tfbar{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .tfbar button{background:var(--ink-2);border:none;border-right:1px solid var(--line-soft);color:var(--cream-dim);
+    padding:7px 12px;font-family:'JetBrains Mono',monospace;font-size:.7rem;cursor:pointer;transition:.2s}
+  .tfbar button:last-child{border-right:none}
+  .tfbar button:hover{color:var(--amber)}
+  .tfbar button.on{background:var(--amber);color:var(--ink);font-weight:700}
+  .tf-note{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted)}
+  .chart-body{flex:1;display:flex;gap:8px;min-height:400px}
+  .tools{flex:none;width:38px;display:flex;flex-direction:column;align-items:center;gap:4px;
+    background:var(--ink-2);border:1px solid var(--line-soft);border-radius:9px;padding:5px 0}
+  .tools button{width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:none;
+    border:1px solid transparent;border-radius:6px;color:var(--cream-dim);cursor:pointer;transition:.15s}
+  .tools button:hover{border-color:var(--line);color:var(--cream)}
+  .tools button.on{background:var(--panel-2);border-color:var(--amber);color:var(--amber)}
+  .tools button.trash:hover{border-color:var(--red-d);color:var(--red)}
+  .tools .sep{width:22px;height:1px;background:var(--line);margin:3px 0}
+  .tools svg{width:18px;height:18px}
+  .plot{flex:1;position:relative;min-width:0}
+  #chart{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair;touch-action:pan-y}
+  .legend{position:absolute;left:8px;top:4px;pointer-events:none;font-family:'JetBrains Mono',monospace;
+    font-size:.68rem;color:var(--muted);line-height:1.6;text-shadow:0 1px 3px #000}
+  .legend b{font-family:'Manrope',sans-serif;font-weight:700;font-size:.8rem;color:var(--cream)}
+  .legend i{font-style:normal;margin-right:8px}
+  .legend .sim{font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--red);
+    border:1px solid var(--red-d);border-radius:4px;padding:1px 5px;margin-left:4px}
+  .drawhint{position:absolute;left:8px;bottom:30px;max-width:calc(100% - 90px);pointer-events:none;display:none;
+    background:rgba(12,10,8,.9);border:1px solid var(--amber);border-radius:7px;padding:6px 10px;
+    font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--cream-dim);line-height:1.55}
+  .drawhint.show{display:block}
+  .drawhint b{color:var(--amber)}
+  .drawhint .w{color:var(--red)}
 
   /* order ticket */
   .ticket{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;height:fit-content}
@@ -227,7 +261,16 @@
     .acct{grid-template-columns:repeat(2,1fr)}
     .acct .cell:last-child{grid-column:1/-1}
     .chartwrap{min-height:340px}
+    .chart-body{min-height:380px}
     table{min-width:620px}
+  }
+  @media(max-width:600px){
+    .legend{font-size:.58rem;right:76px}
+    .legend>div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .legend b{font-size:.72rem}
+    .legend i{margin-right:5px}
+    .drawhint{font-size:.56rem;padding:5px 8px;bottom:26px}
+    .tf-note{display:none}
   }
 </style>
 </head>
@@ -268,7 +311,7 @@
     <span>Бүх үнэ зохиомол. Энд хийсэн арилжаа <b>бодит мөнгөнд шилждэггүй</b>, бодит зах зээлийн үр дүнг ч илэрхийлэхгүй.</span>
   </div>
   <div class="kb-hint">
-    ⌨ <b>B</b> авах &nbsp;·&nbsp; <b>S</b> зарах &nbsp;·&nbsp; <b>X</b> бүгдийг хаах &nbsp;·&nbsp; <b>Space</b> зогсоох/үргэлжлүүлэх &nbsp;·&nbsp; <b>1/2/4</b> хурд
+    ⌨ <b>B</b> авах &nbsp;·&nbsp; <b>S</b> зарах &nbsp;·&nbsp; <b>X</b> бүгдийг хаах &nbsp;·&nbsp; <b>Space</b> зогсоох/үргэлжлүүлэх &nbsp;·&nbsp; <b>1/2/4</b> хурд &nbsp;·&nbsp; <b>Esc</b> зураг цуцлах &nbsp;·&nbsp; <b>Del</b> сонгосон зургийг устгах
   </div>
 
   <div class="acct">
@@ -289,9 +332,33 @@
           <div><small>Bid (Зарах)</small><span class="q down" id="chBid">—</span></div>
           <div><small>Ask (Авах)</small><span class="q up" id="chAsk">—</span></div>
           <div title="Арилжаа нээх бүрт төлөх далд зардал. Бодит зах зээлд мэдээ, шөнийн цагаар хэд дахин өргөсдөг."><small>Spread · зардал</small><span class="q" id="chSpread" style="color:var(--cream-dim)">—</span></div>
+          <div title="Сүүлийн 24 цагийн (симуляцийн цаг) үнийн өөрчлөлт"><small>24ц өөрчлөлт</small><span class="q" id="chChg">—</span></div>
         </div>
       </div>
-      <canvas id="chart"></canvas>
+      <div class="chart-bar">
+        <div class="tfbar" id="tfbar">
+          <button data-tf="1" class="on">1m</button><button data-tf="5">5m</button><button data-tf="15">15m</button><button data-tf="60">1H</button><button data-tf="240">4H</button>
+        </div>
+        <span class="tf-note">Симуляцийн цаг: 1 минут ≈ 5 сек (1×)</span>
+      </div>
+      <div class="chart-body">
+        <div class="tools" id="tools">
+          <button data-tool="cursor" class="on" title="Курсор · зургийг сонгох (Del — устгах)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 3v7M12 14v7M3 12h7M14 12h7"/></svg></button>
+          <div class="sep"></div>
+          <button data-tool="trend" title="Трэнд шугам"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 18L18 6"/><circle cx="5" cy="19" r="1.8"/><circle cx="19" cy="5" r="1.8"/></svg></button>
+          <button data-tool="hline" title="Хэвтээ шугам · түвшин тэмдэглэх"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 12h7M14 12h7"/><circle cx="12" cy="12" r="1.8"/></svg></button>
+          <button data-tool="fib" title="Fibonacci Retracement"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 5h18M3 9.5h18M3 14h18M3 19h18"/><path d="M5 19L19 5" stroke-dasharray="2 2.5"/></svg></button>
+          <button data-tool="rect" title="Тэгш өнцөгт · бүс тэмдэглэх"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="6" width="16" height="12" rx="1"/></svg></button>
+          <button data-tool="text" title="Текст · тэмдэглэл"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M5 6h14M12 6v13M9 19h6"/></svg></button>
+          <div class="sep"></div>
+          <button id="clearDraw" class="trash" title="Бүх зургийг арилгах"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
+        </div>
+        <div class="plot">
+          <canvas id="chart"></canvas>
+          <div class="legend" id="legend"></div>
+          <div class="drawhint" id="drawHint"></div>
+        </div>
+      </div>
     </div>
 
     <div class="ticket">
@@ -375,7 +442,8 @@
       <div class="stp"><div class="n">1</div><div class="tx"><b>Хэрэгсэл сонго.</b> Дээд талын табаас EUR/USD, алт, BTC, эсвэл Apple-ийг сонгоно. График нь жинхэнэ юм шиг хөдөлдөг симуляц.</div></div>
       <div class="stp"><div class="n">2</div><div class="tx"><b>Эрсдэлээ тооцоол.</b> Stop Loss үнэ оруулаад "Лот тооц" дарвал, дансныхаа зөвхөн 1–2%-ийг эрсдэх лотыг өөрөө бодож өгнө. <b>Энэ зуршлыг эндээс эхэл.</b></div></div>
       <div class="stp"><div class="n">3</div><div class="tx"><b>Арилжаа хий.</b> Ногоон <b>Авах</b> (өснө гэвэл) эсвэл улаан <b>Зарах</b> (буурна гэвэл) товч дар. Stop Loss / Take Profit тавьвал автоматаар хаагдана.</div></div>
-      <div class="stp"><div class="n">4</div><div class="tx"><b>Үр дүнгээ хар.</b> "Статистик" табаас хожих хувь, profit factor, хөрөнгийн муруйгаа хянаж, өөрийгөө сайжруул.</div></div>
+      <div class="stp"><div class="n">4</div><div class="tx"><b>Графикаа унш.</b> 1m–4H timeframe сольж, volume ба лааг хамт хар. Зүүн талын хэрэгслээр дэмжлэг/эсэргүүцэл, трэнд, Фибоначчи түвшнээ тэмдэглэ — TradingView, MetaTrader дээр яг ийм хэрэгсэл байдаг.</div></div>
+      <div class="stp"><div class="n">5</div><div class="tx"><b>Үр дүнгээ хар.</b> "Статистик" табаас хожих хувь, profit factor, хөрөнгийн муруйгаа хянаж, өөрийгөө сайжруул.</div></div>
     </div>
     <div class="warn"><b>Санах зүйл:</b> хэт том лот барьж хөшүүрэг хэтрүүлбэл маржин хүрэлцэхгүй болж позиц <b>албадан хаагдана (stop out)</b> — яг л жинхэнэ дансанд. Эхлээд жижгээр, болгоомжтой.</div>
     <div class="warn"><b>Бодит зах зээл хатуу:</b> энэ симуляцид spread тогтмол, slippage ба gap бараг байхгүй. Бодит дансанд spread өргөсөж, захиалга муу үнээр биелж, амралтын дараа үнэ stop-loss-ийг давж үсэрч болно. Демо дээрх ашиг бодит ашгийн баталгаа биш.</div>
@@ -411,24 +479,35 @@ const SYMS={
   AAPL  :{name:'Apple хувьцаа',price:212.40, contract:100,  lev:5,   spread:0.06,   vol:0.0026,  dec:2, step:1,    defVol:1}
 };
 const KEYS=Object.keys(SYMS);
-const MAX_CANDLES=70, TICKS_PER_CANDLE=7, START_BAL=10000, STOPOUT=40; // margin level %
+// Суурь лаа = 1 минут (TICKS_PER_CANDLE тик). 5m–4H-ийг эндээс нэгтгэнэ, тиймээс 4H-ийн ~125 лаа багтах түүх хадгална.
+const MAX_BASE=240*125, TICKS_PER_CANDLE=7, START_BAL=10000, STOPOUT=40; // margin level %
+const MIN=60000;
 
 /* ---------- Төлөв ---------- */
 let state={ balance:START_BAL, positions:[], pending:[], history:[], curve:[START_BAL], nextId:1 };
-let sel='EURUSD', orderType='market';
+let sel='EURUSD', orderType='market', tf=1;
 let running=true, speed=1, baseInterval=720, timer=null, tickCount=0;
-let live={}; // sym -> {bid, ask, candles:[{o,h,l,c}], cur:{o,h,l,c}, flash}
+let live={}; // sym -> {mid, candles:[{t,o,h,l,c,v}] (1m), cur:{t,o,h,l,c,v}}
 
+// Арилжааны идэвх цагаас хамаарна: Лондон (~09 UTC), Нью-Йорк (~14:30 UTC) нээгдэхэд хэлбэлзэл, volume өснө
+function activity(t){
+  const h=(t/3600000)%24;
+  return 0.45+0.7*Math.exp(-(((h-9)/2.5)**2))+0.9*Math.exp(-(((h-14.5)/2)**2));
+}
 function initLive(){
+  const now=Math.floor(Date.now()/MIN)*MIN;
   KEYS.forEach(k=>{
-    const s=SYMS[k], p=s.price;
-    live[k]={mid:p, candles:[], cur:{o:p,h:p,l:p,c:p,v:0}, ticks:0};
-    for(let i=0;i<MAX_CANDLES;i++){
-      let o=live[k].cur.c, c=o*(1+s.vol*(Math.random()*2-1)*2.2);
-      let h=Math.max(o,c)*(1+s.vol*Math.random()), l=Math.min(o,c)*(1-s.vol*Math.random());
-      const v=Math.round(500+Math.random()*1500);
-      live[k].candles.push({o,h,l,c,v}); live[k].cur={o:c,h:c,l:c,c:c,v:0}; live[k].mid=c;
+    const s=SYMS[k], candles=[];
+    let c0=s.price;
+    for(let i=0;i<MAX_BASE;i++){
+      const t=now-(MAX_BASE-i)*MIN, a=activity(t), o=c0;
+      let c=o*(1+s.vol*Math.sqrt(a)*(Math.random()*2-1)*2.2);
+      c+=(s.price-c)*0.002; // зөөлөн буцах хүч — урт түүхэнд үнэ хэт холдохгүй
+      const h=Math.max(o,c)*(1+s.vol*Math.random()), l=Math.min(o,c)*(1-s.vol*Math.random());
+      const v=Math.round(a*(200+Math.abs(c-o)/o/s.vol*450+Math.random()*500)); // том лаа → их volume
+      candles.push({t,o,h,l,c,v}); c0=c;
     }
+    live[k]={mid:c0, candles, cur:{t:now,o:c0,h:c0,l:c0,c:c0,v:0}};
   });
 }
 
@@ -437,16 +516,16 @@ function tick(){
   KEYS.forEach(k=>{
     const s=SYMS[k], L=live[k];
     const shock=(Math.random()*2-1);
-    L.mid=Math.max(s.dec===5?0.0001:0.01, L.mid*(1+s.vol*shock));
+    L.mid=Math.max(s.dec===5?0.0001:0.01, L.mid*(1+s.vol*Math.sqrt(activity(L.cur.t))*shock));
     L.cur.c=L.mid; L.cur.h=Math.max(L.cur.h,L.mid); L.cur.l=Math.min(L.cur.l,L.mid);
-    L.cur.v+= Math.round(200+Math.random()*800);
+    L.cur.v+= Math.round(activity(L.cur.t)*(30+Math.abs(shock)*200+Math.random()*45));
   });
-  tickCount++;
+  tickCount++; aggVer++;
   if(tickCount>=TICKS_PER_CANDLE){
     tickCount=0;
     KEYS.forEach(k=>{
-      const L=live[k]; L.candles.push({...L.cur}); if(L.candles.length>MAX_CANDLES)L.candles.shift();
-      L.cur={o:L.mid,h:L.mid,l:L.mid,c:L.mid,v:0};
+      const L=live[k]; L.candles.push({...L.cur}); if(L.candles.length>MAX_BASE)L.candles.shift();
+      L.cur={t:L.cur.t+MIN,o:L.mid,h:L.mid,l:L.mid,c:L.mid,v:0};
     });
   }
   checkPending(); checkSLTP(); checkStopout();
@@ -574,7 +653,7 @@ function render(){
   const st=$('symtabs');
   if(st.children.length!==KEYS.length){
     st.innerHTML=KEYS.map(k=>`<div class="symtab" data-k="${k}"><span class="s">${k}</span><span class="p" id="tabp_${k}"></span></div>`).join('');
-    [...st.children].forEach(el=>el.onclick=()=>{sel=el.dataset.k; resetTicket(); render();});
+    [...st.children].forEach(el=>el.onclick=()=>{sel=el.dataset.k; draft=null; selId=null; resetTicket(); render();});
   }
   KEYS.forEach(k=>{ $('tabp_'+k).textContent=fmt(live[k].mid,SYMS[k].dec); });
   [...st.children].forEach(el=>el.classList.toggle('on', el.dataset.k===sel));
@@ -584,6 +663,9 @@ function render(){
   $('chSym').textContent=s.name;
   $('chBid').textContent=fmt(q.bid,s.dec); $('chAsk').textContent=fmt(q.ask,s.dec);
   $('chSpread').textContent=fmt(s.spread, s.dec);
+  const base=live[sel].candles, ref=base[Math.max(0,base.length-1440)].c, ch=live[sel].mid-ref, sg=ch>=0?'+':'';
+  $('chChg').textContent=`${sg}${fmt(ch,s.dec)} (${sg}${(ch/ref*100).toFixed(2)}%)`;
+  $('chChg').className='q '+(ch>=0?'up':'down');
   $('sellP').textContent=fmt(q.bid,s.dec); $('buyP').textContent=fmt(q.ask,s.dec);
   const lots=parseFloat($('vol').value)||0;
   $('notional').textContent=`1 лот = ${fmt(s.contract,0)} нэгж · хөшүүрэг 1:${s.lev} · энэ захиалгын маржин ≈ ${money(lots*s.contract*live[sel].mid/s.lev)}`;
@@ -596,67 +678,281 @@ function resetTicket(){ const s=SYMS[sel]; $('vol').value=s.defVol; $('vol').ste
 
 /* ---------- Canvas chart ---------- */
 const cv=$('chart'), ctx=cv.getContext('2d');
+const TZ=new Date().getTimezoneOffset()*MIN;
+const DRAW_COL='#4c8dff';
+const FIB=[0,0.236,0.382,0.5,0.618,0.786,1];
+const FIB_COL=['#9a9284','#e0564b','#e0a526','#43c47a','#2bb5a5','#4c8dff','#9a9284'];
+let G=null;                         // сүүлд зурсан графикийн геометр (хулганы координат хөрвүүлэхэд)
+let hover=null;                     // {x,y} хулганы байрлал
+let aggVer=0, aggCache={key:'',groups:null};
+let tool='cursor', draft=null, selId=null, drawSeq=0;
+const drawings={}; KEYS.forEach(k=>drawings[k]=[]);
+
+function p2(n){ return String(n).padStart(2,'0'); }
+function tfLabel(m){ return m<60?m+'m':(m/60)+'H'; }
+function fmtT(t){ const d=new Date(t), hm=p2(d.getHours())+':'+p2(d.getMinutes()); return tf>=60?p2(d.getMonth()+1)+'/'+p2(d.getDate())+' '+hm:hm; }
+function fmtVol(v){ return v>=1e6?(v/1e6).toFixed(2)+'M':v>=1e3?(v/1e3).toFixed(2)+'K':String(v); }
+
+// 1 минутын лаануудыг сонгосон timeframe руу нэгтгэх (сүүлийн n лаа)
+function groupsFor(k,m,n){
+  const key=k+'|'+m+'|'+n+'|'+aggVer;
+  if(aggCache.key===key) return aggCache.groups;
+  const L=live[k], ms=m*MIN, out=[];
+  let g=null, full=false;
+  const add=c=>{
+    const gt=Math.floor(c.t/ms)*ms;
+    if(g&&g.t===gt){ g.o=c.o; g.h=Math.max(g.h,c.h); g.l=Math.min(g.l,c.l); g.v+=c.v; return; }
+    if(g){ out.push(g); if(out.length>=n){ full=true; return; } }
+    g={t:gt,o:c.o,h:c.h,l:c.l,c:c.c,v:c.v};
+  };
+  add(L.cur);
+  for(let i=L.candles.length-1;i>=0&&!full;i--) add(L.candles[i]);
+  if(!full&&g) out.push(g);
+  out.reverse();
+  aggCache={key,groups:out};
+  return out;
+}
+
 function drawChart(){
   const L=live[sel], s=SYMS[sel];
   const dpr=window.devicePixelRatio||1;
   const w=cv.clientWidth, h=cv.clientHeight||360;
   cv.width=w*dpr; cv.height=h*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.clearRect(0,0,w,h);
-  const padR=72, padT=10, padB=44, volH=36, plotH=h-padT-padB-volH, plotW=w-padR;
+  const padR=72, padT=8, axisH=22, plotW=w-padR;
+  const mainH=h-padT-axisH, plotH=mainH*0.78, volTop=padT+mainH*0.8, volH=mainH*0.2, bottom=padT+mainH;
+  const RIGHT=4, n=Math.max(30,Math.min(110,Math.round(plotW/10)));
+  const groups=groupsFor(sel,tf,n), ms=tf*MIN, off=n-groups.length;
+  const cw=plotW/(n+RIGHT), bw=Math.max(1.5,cw*0.64);
+  const t0=groups[0].t-off*ms;
 
-  const candles=[...L.candles, L.cur];
   let hi=-Infinity, lo=Infinity;
-  candles.forEach(c=>{hi=Math.max(hi,c.h);lo=Math.min(lo,c.l);});
-  const volTop=padT+plotH+8, volBase=volTop+volH-4;
-  const maxVol=Math.max(1,...candles.map(c=>c.v||0));
+  groups.forEach(c=>{hi=Math.max(hi,c.h);lo=Math.min(lo,c.l);});
   // багтаах: позицийн SL/TP/open мөн харагдана
   state.positions.filter(p=>p.sym===sel).forEach(p=>{ hi=Math.max(hi,p.open,p.tp||p.open,p.sl||p.open); lo=Math.min(lo,p.open,p.tp||p.open,p.sl||p.open); });
   state.pending.filter(p=>p.sym===sel).forEach(p=>{ hi=Math.max(hi,p.trig); lo=Math.min(lo,p.trig); });
-  const pad=(hi-lo)*0.12||hi*0.001; hi+=pad; lo-=pad;
-  const y=v=>padT+plotH-((v-lo)/(hi-lo))*plotH;
+  // дээд талд legend-д зай үлдээнэ (нарийн дэлгэцэд legend-ийн эзлэх хэсэг харьцангуй том)
+  const rng=(hi-lo)||hi*0.001; hi+=rng*(w<520?0.3:0.16); lo-=rng*0.06;
+  const X=t=>((t-t0)/ms)*cw+cw/2, Y=v=>padT+plotH-((v-lo)/(hi-lo))*plotH;
+  G={t0,ms,cw,plotW,padR,padT,plotH,mainH,bottom,X,Y,
+     T:x=>t0+Math.round((x-cw/2)/cw)*ms, P:y=>lo+((padT+plotH-y)/plotH)*(hi-lo)};
 
-  // grid + axis
-  ctx.font='10px "JetBrains Mono", monospace'; ctx.textBaseline='middle';
-  for(let i=0;i<=4;i++){
-    const gy=padT+plotH*i/4, val=hi-(hi-lo)*i/4;
+  // үнийн тор + тэнхлэг
+  ctx.font='10px "JetBrains Mono", monospace'; ctx.textBaseline='middle'; ctx.lineWidth=1;
+  const rows=Math.max(3,Math.floor(plotH/55));
+  for(let i=0;i<=rows;i++){
+    const gy=padT+plotH*i/rows, val=lo+(hi-lo)*(1-((gy-padT)/plotH));
     ctx.strokeStyle='rgba(255,255,255,.045)'; ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(plotW,gy); ctx.stroke();
     ctx.fillStyle='#80776a'; ctx.textAlign='left'; ctx.fillText(fmt(val,s.dec), plotW+8, gy);
   }
+  // цагийн тор + тэнхлэг (тойрог цагуудаар)
+  const IV=[1,2,5,10,15,30,60,120,180,240,360,720,1440,2880,4320,10080];
+  const iv=(IV.find(m=>m>=tf&&(m/tf)*cw>=78)||10080)*MIN;
+  ctx.textAlign='center';
+  groups.forEach(g=>{
+    if((g.t-TZ)%iv!==0) return;
+    const gx=X(g.t), d=new Date(g.t), midnight=d.getHours()===0&&d.getMinutes()===0;
+    if(gx<20||gx>plotW-20) return;
+    ctx.strokeStyle='rgba(255,255,255,.035)'; ctx.beginPath(); ctx.moveTo(gx,padT); ctx.lineTo(gx,bottom); ctx.stroke();
+    ctx.fillStyle=midnight?'#b8ad99':'#80776a';
+    ctx.font=(midnight?'bold ':'')+'10px "JetBrains Mono", monospace';
+    ctx.fillText(midnight?p2(d.getMonth()+1)+'/'+p2(d.getDate()):p2(d.getHours())+':'+p2(d.getMinutes()), gx, bottom+axisH/2+1);
+  });
+  ctx.strokeStyle='#332c22'; ctx.beginPath(); ctx.moveTo(0,bottom+.5); ctx.lineTo(w,bottom+.5); ctx.moveTo(plotW+.5,0); ctx.lineTo(plotW+.5,bottom); ctx.stroke();
 
-  const n=candles.length, cw=plotW/n, bw=Math.max(2, cw*0.62);
-  candles.forEach((c,i)=>{
-    const cx=cw*i+cw/2, up=c.c>=c.o;
-    const col=up?'#43c47a':'#e0564b';
+  // лаа + volume
+  const maxVol=Math.max(1,...groups.map(c=>c.v||0));
+  groups.forEach((c,i)=>{
+    const cx=cw*(i+off)+cw/2, col=c.c>=c.o?'#43c47a':'#e0564b';
     ctx.strokeStyle=col; ctx.fillStyle=col;
-    ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(cx,y(c.h)); ctx.lineTo(cx,y(c.l)); ctx.stroke();
-    const yo=y(c.o), yc=y(c.c); ctx.fillRect(cx-bw/2, Math.min(yo,yc), bw, Math.max(1,Math.abs(yc-yo)));
-    // volume bar
+    ctx.beginPath(); ctx.moveTo(cx,Y(c.h)); ctx.lineTo(cx,Y(c.l)); ctx.stroke();
+    const yo=Y(c.o), yc=Y(c.c); ctx.fillRect(cx-bw/2, Math.min(yo,yc), bw, Math.max(1,Math.abs(yc-yo)));
     if(c.v>0){
-      const vh=Math.max(2,((c.v/maxVol)*(volH-6)));
-      ctx.globalAlpha=0.45; ctx.fillStyle=col;
-      ctx.fillRect(cx-bw/2, volBase-vh, bw, vh);
-      ctx.globalAlpha=1;
+      const vh=Math.max(1,(c.v/maxVol)*(volH-4));
+      ctx.globalAlpha=0.38; ctx.fillRect(cx-bw/2, bottom-vh, bw, vh); ctx.globalAlpha=1;
     }
   });
 
-  // current price line
-  const cyp=y(L.mid);
-  ctx.strokeStyle='rgba(224,165,38,.55)'; ctx.setLineDash([4,4]); ctx.lineWidth=1;
+  drawDrawings(s);
+
+  // одоогийн үнийн шугам
+  const cyp=Y(L.mid);
+  ctx.strokeStyle='rgba(224,165,38,.55)'; ctx.setLineDash([4,4]);
   ctx.beginPath(); ctx.moveTo(0,cyp); ctx.lineTo(plotW,cyp); ctx.stroke(); ctx.setLineDash([]);
   ctx.fillStyle='#e0a526'; ctx.fillRect(plotW,cyp-9,padR,18);
   ctx.fillStyle='#0c0a08'; ctx.textAlign='left'; ctx.font='bold 10px "JetBrains Mono"'; ctx.fillText(fmt(L.mid,s.dec),plotW+8,cyp);
 
-  // position lines
+  // позицийн шугамууд
   state.positions.filter(p=>p.sym===sel).forEach(p=>{
-    line(p.open, '#e0a526', (p.dir>0?'BUY ':'SELL ')+p.lots, y, plotW, padR, false);
-    if(p.sl!==null) line(p.sl,'#e0564b','SL',y,plotW,padR,true);
-    if(p.tp!==null) line(p.tp,'#43c47a','TP',y,plotW,padR,true);
+    line(p.open, '#e0a526', (p.dir>0?'BUY ':'SELL ')+p.lots, Y, plotW, padR, false);
+    if(p.sl!==null) line(p.sl,'#e0564b','SL',Y,plotW,padR,true);
+    if(p.tp!==null) line(p.tp,'#43c47a','TP',Y,plotW,padR,true);
   });
-  // pending order lines
+  // хүлээгдэж буй захиалгын шугамууд
   state.pending.filter(p=>p.sym===sel).forEach(p=>{
-    line(p.trig, '#b8ad99', (p.dir>0?'⤴ авах':'⤵ зарах')+' '+p.lots, y, plotW, padR, true);
+    line(p.trig, '#b8ad99', (p.dir>0?'⤴ авах':'⤵ зарах')+' '+p.lots, Y, plotW, padR, true);
+  });
+
+  // crosshair — лааны төв рүү наалдана
+  let hIdx=groups.length-1;
+  if(hover&&hover.x<plotW&&hover.y<bottom){
+    const slot=Math.round((hover.x-cw/2)/cw), sx=slot*cw+cw/2;
+    if(slot-off>=0&&slot-off<groups.length) hIdx=slot-off;
+    ctx.strokeStyle='rgba(184,173,153,.45)'; ctx.setLineDash([3,4]);
+    ctx.beginPath(); ctx.moveTo(sx,0); ctx.lineTo(sx,bottom); ctx.moveTo(0,hover.y); ctx.lineTo(plotW,hover.y); ctx.stroke(); ctx.setLineDash([]);
+    ctx.font='10px "JetBrains Mono"';
+    if(hover.y<=padT+plotH+6){
+      ctx.fillStyle='#3a332a'; ctx.fillRect(plotW,hover.y-9,padR,18);
+      ctx.fillStyle='#ede4d3'; ctx.textAlign='left'; ctx.fillText(fmt(G.P(hover.y),s.dec),plotW+8,hover.y);
+    }
+    const tl=fmtT(G.T(sx)), tw=ctx.measureText(tl).width+14;
+    ctx.fillStyle='#3a332a'; ctx.fillRect(Math.min(Math.max(0,sx-tw/2),w-tw),bottom+2,tw,axisH-4);
+    ctx.fillStyle='#ede4d3'; ctx.textAlign='center'; ctx.fillText(tl,Math.min(Math.max(tw/2,sx),w-tw/2),bottom+axisH/2+1);
+  }
+
+  // legend: OHLC + өөрчлөлт + volume (хулганатай лаа, эс бөгөөс сүүлийнх)
+  const c=groups[hIdx], prev=groups[hIdx-1], base=prev?prev.c:c.o, ch=c.c-base, sg=ch>=0?'+':'';
+  const cls=c.c>=c.o?'up':'down', f=v=>`<span class="${cls}">${fmt(v,s.dec)}</span>`;
+  $('legend').innerHTML=
+    `<div><b>${s.name}</b> · ${tfLabel(tf)} <span class="sim">Симуляц</span></div>`+
+    `<div><i>O ${f(c.o)}</i><i>H ${f(c.h)}</i><i>L ${f(c.l)}</i><i>C ${f(c.c)}</i><i class="${ch>=0?'up':'down'}">${sg}${fmt(ch,s.dec)} (${sg}${(ch/base*100).toFixed(2)}%)</i></div>`+
+    `<div>Vol <span class="${cls}">${fmtVol(c.v)}</span></div>`;
+}
+
+/* ---------- Drawing tools ---------- */
+function drawDrawings(s){
+  const {X,Y,plotW,padR,bottom}=G;
+  const list=drawings[sel].slice(); if(draft) list.push(draft);
+  ctx.save(); ctx.beginPath(); ctx.rect(0,0,plotW,bottom); ctx.clip();
+  list.forEach(d=>{
+    const on=d===draft||d.id===selId;
+    ctx.strokeStyle=DRAW_COL; ctx.fillStyle=DRAW_COL; ctx.lineWidth=on?2:1.4; ctx.setLineDash([]);
+    if(d.type==='trend'){
+      ctx.beginPath(); ctx.moveTo(X(d.a.t),Y(d.a.p)); ctx.lineTo(X(d.b.t),Y(d.b.p)); ctx.stroke();
+      if(on) [d.a,d.b].forEach(q=>{ ctx.beginPath(); ctx.arc(X(q.t),Y(q.p),3.5,0,7); ctx.fill(); });
+    } else if(d.type==='hline'){
+      const gy=Y(d.p); ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(plotW,gy); ctx.stroke();
+    } else if(d.type==='rect'){
+      const x1=X(d.a.t), y1=Y(d.a.p), x2=X(d.b.t), y2=Y(d.b.p);
+      ctx.globalAlpha=0.12; ctx.fillRect(Math.min(x1,x2),Math.min(y1,y2),Math.abs(x2-x1),Math.abs(y2-y1));
+      ctx.globalAlpha=1; ctx.strokeRect(Math.min(x1,x2),Math.min(y1,y2),Math.abs(x2-x1),Math.abs(y2-y1));
+    } else if(d.type==='fib'){
+      const xa=Math.min(X(d.a.t),X(d.b.t)), xb=Math.max(X(d.a.t),X(d.b.t));
+      ctx.font='9px "JetBrains Mono"'; ctx.textAlign='left'; ctx.textBaseline='bottom';
+      FIB.forEach((lv,i)=>{
+        const pr=d.b.p+(d.a.p-d.b.p)*lv, gy=Y(pr);
+        if(i<FIB.length-1){ const ny=Y(d.b.p+(d.a.p-d.b.p)*FIB[i+1]); ctx.globalAlpha=0.07; ctx.fillStyle=FIB_COL[i+1]; ctx.fillRect(xa,Math.min(gy,ny),xb-xa,Math.abs(ny-gy)); ctx.globalAlpha=1; }
+        ctx.strokeStyle=FIB_COL[i]; ctx.lineWidth=on?1.6:1; ctx.beginPath(); ctx.moveTo(xa,gy); ctx.lineTo(xb,gy); ctx.stroke();
+        ctx.fillStyle=FIB_COL[i]; ctx.fillText(`${lv} (${fmt(pr,s.dec)})`, xa+3, gy-2);
+      });
+      ctx.textBaseline='middle';
+      ctx.strokeStyle='rgba(184,173,153,.5)'; ctx.setLineDash([3,3]); ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(X(d.a.t),Y(d.a.p)); ctx.lineTo(X(d.b.t),Y(d.b.p)); ctx.stroke(); ctx.setLineDash([]);
+    } else if(d.type==='text'){
+      const tx=X(d.a.t), ty=Y(d.a.p);
+      ctx.font='600 12px Manrope, sans-serif'; ctx.textAlign='left';
+      const tw=ctx.measureText(d.txt).width;
+      ctx.fillStyle='rgba(12,10,8,.78)'; ctx.fillRect(tx-4,ty-10,tw+8,20);
+      if(on){ ctx.strokeStyle=DRAW_COL; ctx.strokeRect(tx-4,ty-10,tw+8,20); }
+      ctx.fillStyle='#ede4d3'; ctx.fillText(d.txt,tx,ty);
+    }
+  });
+  ctx.restore();
+  // хэвтээ шугамын үнийг тэнхлэг дээр
+  ctx.font='10px "JetBrains Mono"'; ctx.textAlign='left';
+  drawings[sel].filter(d=>d.type==='hline').forEach(d=>{
+    const gy=Y(d.p); if(gy<G.padT||gy>bottom) return;
+    ctx.fillStyle=DRAW_COL; ctx.fillRect(plotW,gy-9,padR,18);
+    ctx.fillStyle='#fff'; ctx.fillText(fmt(d.p,s.dec),plotW+8,gy);
   });
 }
+
+function distSeg(px,py,x1,y1,x2,y2){
+  const dx=x2-x1, dy=y2-y1, l2=dx*dx+dy*dy;
+  const t=l2?Math.max(0,Math.min(1,((px-x1)*dx+(py-y1)*dy)/l2)):0;
+  return Math.hypot(px-(x1+t*dx), py-(y1+t*dy));
+}
+function hitTest(d,x,y){
+  const {X,Y}=G, tol=6;
+  if(d.type==='trend') return distSeg(x,y,X(d.a.t),Y(d.a.p),X(d.b.t),Y(d.b.p))<tol;
+  if(d.type==='hline') return Math.abs(y-Y(d.p))<tol;
+  if(d.type==='text'){ ctx.font='600 12px Manrope, sans-serif'; const tx=X(d.a.t), ty=Y(d.a.p); return x>=tx-4&&x<=tx+ctx.measureText(d.txt).width+4&&Math.abs(y-ty)<=10; }
+  const x1=Math.min(X(d.a.t),X(d.b.t)), x2=Math.max(X(d.a.t),X(d.b.t));
+  if(x<x1-tol||x>x2+tol) return false;
+  if(d.type==='rect'){ const y1=Math.min(Y(d.a.p),Y(d.b.p)), y2=Math.max(Y(d.a.p),Y(d.b.p)); return y>=y1-tol&&y<=y2+tol; }
+  if(d.type==='fib') return FIB.some(lv=>Math.abs(y-Y(d.b.p+(d.a.p-d.b.p)*lv))<tol);
+  return false;
+}
+
+const HINTS={
+  trend:'<b>Трэнд шугам:</b> эхлэл ба төгсгөлийн цэг дээр дар (эсвэл чирж зур)',
+  hline:'<b>Хэвтээ шугам:</b> тэмдэглэх түвшин дээр дар',
+  fib:'<b>Фибоначчи:</b> хөдөлгөөний эхлэл (1) → төгсгөл (0) хүртэл чир',
+  rect:'<b>Тэгш өнцөгт:</b> нэг булангаас эсрэг булан руу чир',
+  text:'<b>Тэмдэглэл:</b> бичих газар дээр дар',
+};
+function setTool(t){
+  tool=t; draft=null;
+  document.querySelectorAll('#tools [data-tool]').forEach(b=>b.classList.toggle('on',b.dataset.tool===t));
+  cv.style.touchAction=t==='cursor'?'pan-y':'none';
+  const hint=$('drawHint');
+  hint.innerHTML=t==='cursor'?'':HINTS[t]+' · <b>Esc</b> — цуцлах<br><span class="w">⚠ Симуляц — зурсан түвшин бодит зах зээлийн дохио биш.</span>';
+  hint.classList.toggle('show',t!=='cursor');
+  drawChart();
+}
+function addDrawing(d){
+  const {sx,sy,...clean}=d;
+  drawings[sel].push({...clean,id:++drawSeq});
+  draft=null; selId=null; setTool('cursor');
+}
+function ptr(e){ const r=cv.getBoundingClientRect(); return {x:e.clientX-r.left, y:e.clientY-r.top}; }
+function inPlot(p){ return G&&p.x<G.plotW&&p.y<G.bottom; }
+
+cv.addEventListener('pointermove',e=>{
+  hover=ptr(e);
+  if(draft&&G) draft.b={t:G.T(hover.x),p:G.P(hover.y)};
+  drawChart();
+});
+cv.addEventListener('pointerleave',()=>{ hover=null; drawChart(); });
+cv.addEventListener('pointerdown',e=>{
+  const p=ptr(e); hover=p;
+  if(!inPlot(p)) return;
+  const pt={t:G.T(p.x),p:G.P(p.y)};
+  if(tool==='cursor'){
+    const list=drawings[sel]; let found=null;
+    for(let i=list.length-1;i>=0;i--) if(hitTest(list[i],p.x,p.y)){ found=list[i]; break; }
+    selId=found?found.id:null; drawChart(); return;
+  }
+  if(tool==='hline'){ addDrawing({type:'hline',p:pt.p}); return; }
+  if(tool==='text'){
+    const txt=prompt('Тэмдэглэл бичих:');
+    if(txt&&txt.trim()) addDrawing({type:'text',a:pt,txt:txt.trim().slice(0,80)}); else setTool('cursor');
+    return;
+  }
+  if(!draft){ draft={type:tool,a:pt,b:{...pt},sx:p.x,sy:p.y}; cv.setPointerCapture(e.pointerId); drawChart(); }
+  else { draft.b=pt; addDrawing(draft); }
+});
+cv.addEventListener('pointerup',e=>{
+  if(!draft) return;
+  const p=ptr(e);
+  if(Math.hypot(p.x-draft.sx,p.y-draft.sy)>6){ draft.b={t:G.T(p.x),p:G.P(p.y)}; addDrawing(draft); }
+});
+
+$('tools').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  if(b.id==='clearDraw'){
+    const cnt=drawings[sel].length;
+    if(!cnt){ toast('Арилгах зураг алга.'); return; }
+    if(!confirm(`${SYMS[sel].name} дээрх бүх зургийг (${cnt}) арилгах уу?`)) return;
+    drawings[sel]=[]; selId=null; setTool('cursor'); toast('Зургууд арилгагдлаа.'); return;
+  }
+  setTool(b.dataset.tool===tool?'cursor':b.dataset.tool);
+});
+[...$('tfbar').children].forEach(b=>b.onclick=()=>{
+  tf=+b.dataset.tf; draft=null;
+  [...$('tfbar').children].forEach(x=>x.classList.toggle('on',x===b));
+  drawChart();
+});
 function line(val,col,label,y,plotW,padR,dash){
   const gy=y(val); ctx.strokeStyle=col; ctx.lineWidth=1;
   if(dash)ctx.setLineDash([3,3]); ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(plotW,gy); ctx.stroke(); ctx.setLineDash([]);
@@ -815,6 +1111,10 @@ window.addEventListener('resize',()=>{ drawChart(); if(ledgerView==='stats')draw
 /* ---- Keyboard shortcuts ---- */
 document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+  if(e.key==='Escape'){ selId=null; setTool('cursor'); return; }
+  if((e.key==='Delete'||e.key==='Backspace')&&selId){
+    e.preventDefault(); drawings[sel]=drawings[sel].filter(d=>d.id!==selId); selId=null; drawChart(); toast('Зураг устгагдлаа.'); return;
+  }
   if(e.key==='b'||e.key==='B'){ openTrade(1); }
   else if(e.key==='s'||e.key==='S'){ openTrade(-1); }
   else if(e.key==='x'||e.key==='X'){
