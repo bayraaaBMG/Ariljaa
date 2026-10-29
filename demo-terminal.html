@@ -4,7 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 36 36%27%3E%3Crect x=%271%27 y=%271%27 width=%2734%27 height=%2734%27 rx=%279%27 fill=%27%231c1813%27 stroke=%27%23e0a526%27 stroke-width=%271.6%27/%3E%3Cline x1=%2710.5%27 y1=%2724%27 x2=%2710.5%27 y2=%2713%27 stroke=%27%238a8070%27 stroke-width=%271.3%27/%3E%3Crect x=%278%27 y=%2717%27 width=%275%27 height=%275.5%27 rx=%27.5%27 fill=%27%238a8070%27/%3E%3Cline x1=%2718%27 y1=%2727%27 x2=%2718%27 y2=%279%27 stroke=%27%23e0a526%27 stroke-width=%271.3%27/%3E%3Crect x=%2715.5%27 y=%2713%27 width=%275%27 height=%279%27 rx=%27.5%27 fill=%27%23e0a526%27/%3E%3Cline x1=%2725.5%27 y1=%2721%27 x2=%2725.5%27 y2=%277%27 stroke=%27%23f3c969%27 stroke-width=%271.3%27/%3E%3Crect x=%2723%27 y=%279%27 width=%275%27 height=%277%27 rx=%27.5%27 fill=%27%23f3c969%27/%3E%3C/svg%3E">
-<title>Демо Терминал — Арилжаачны Дэвтэр</title>
+<title>Демо терминал — $10,000 виртуал мөнгөөр арилжаа дадлагажих · Арилжаачны Дэвтэр</title>
+<meta name="description" content="Бодит мөнгөгүйгээр арилжаа дадлагажих симуляц: stop-loss, лотын хэмжээ, эрсдэлийн тооцоо, статистик. Үнэ зохиомол, бодит мөнгөнд шилждэггүй.">
+<link rel="canonical" href="https://ariljaa.vercel.app/demo-terminal.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Арилжаачны Дэвтэр">
+<meta property="og:locale" content="mn_MN">
+<meta property="og:title" content="Демо терминал — $10,000 виртуал мөнгөөр арилжаа дадлагажих · Арилжаачны Дэвтэр">
+<meta property="og:description" content="Бодит мөнгөгүйгээр арилжаа дадлагажих симуляц: stop-loss, лотын хэмжээ, эрсдэлийн тооцоо, статистик. Үнэ зохиомол, бодит мөнгөнд шилждэггүй.">
+<meta property="og:url" content="https://ariljaa.vercel.app/demo-terminal.html">
+<meta name="twitter:card" content="summary">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -166,6 +175,19 @@
   .note b{color:var(--amber)}
 
   /* ---- Keyboard hint bar ---- */
+  .simbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px;
+    background:var(--red-bg);border:1px solid var(--red-d);border-radius:10px;padding:9px 14px;
+    font-size:.82rem;color:var(--cream-dim);line-height:1.45}
+  .simbar>b{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink);background:var(--red);border-radius:6px;padding:3px 8px;flex:none}
+  .simbar span b{color:var(--cream)}
+  .reality{margin-top:14px;border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:8px;
+    padding:10px 12px;background:var(--ink-2)}
+  .reality .rh{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--amber);margin-bottom:6px}
+  .reality ul{list-style:none;display:grid;gap:5px}
+  .reality li{font-size:.74rem;color:var(--cream-dim);line-height:1.45}
+  .reality li b{color:var(--cream)}
   .kb-hint{
     font-family:'JetBrains Mono',monospace;font-size:.62rem;
     color:var(--muted);padding:6px 0 0;letter-spacing:.06em;
@@ -229,7 +251,7 @@
       </div>
     </div>
     <div class="controls">
-      <a class="btn" href="ariljaa-surah-devter.html" id="guideBtn" title="Сургалтын гарын авлага">📖 Гарын авлага</a>
+      <a class="btn" href="index.html" id="guideBtn" title="Сургалтын 12 бүлэг">📖 Гарын авлага</a>
       <button class="btn" id="playBtn">⏸ Зогсоох</button>
       <div class="speeds" id="speeds">
         <button data-s="1" class="on">1×</button>
@@ -240,6 +262,10 @@
       <button class="btn danger" id="resetBtn">↺ Дансыг шинэчлэх</button>
       <span class="btn" id="sessionTimer" title="Сессийн хугацаа">⏱ 00:00</span>
     </div>
+  </div>
+  <div class="simbar" role="note">
+    <b>⚠ Зөвхөн симуляци</b>
+    <span>Бүх үнэ зохиомол. Энд хийсэн арилжаа <b>бодит мөнгөнд шилждэггүй</b>, бодит зах зээлийн үр дүнг ч илэрхийлэхгүй.</span>
   </div>
   <div class="kb-hint">
     ⌨ <b>B</b> авах &nbsp;·&nbsp; <b>S</b> зарах &nbsp;·&nbsp; <b>X</b> бүгдийг хаах &nbsp;·&nbsp; <b>Space</b> зогсоох/үргэлжлүүлэх &nbsp;·&nbsp; <b>1/2/4</b> хурд
@@ -262,7 +288,7 @@
         <div class="quote">
           <div><small>Bid (Зарах)</small><span class="q down" id="chBid">—</span></div>
           <div><small>Ask (Авах)</small><span class="q up" id="chAsk">—</span></div>
-          <div><small>Spread</small><span class="q" id="chSpread" style="color:var(--cream-dim)">—</span></div>
+          <div title="Арилжаа нээх бүрт төлөх далд зардал. Бодит зах зээлд мэдээ, шөнийн цагаар хэд дахин өргөсдөг."><small>Spread · зардал</small><span class="q" id="chSpread" style="color:var(--cream-dim)">—</span></div>
         </div>
       </div>
       <canvas id="chart"></canvas>
@@ -309,6 +335,14 @@
         <button class="tbtn buy" id="buyBtn">Авах<small id="buyP">—</small></button>
       </div>
       <div class="hint" id="riskHint">SL тавихгүй бол энэ позицийн эрсдэл хязгааргүй. Эрсдэлийн дүрмээ сана: 1 арилжаанд дансныхаа 1–2%.</div>
+      <div class="reality">
+        <div class="rh">Бодит зах зээлд нэмэгдэх зүйлс</div>
+        <ul>
+          <li><b>Spread</b> — арилжаа нээх бүрт төлдөг зардал. Мэдээ гарах үед, шөнийн цагаар хэд дахин өргөсдөг.</li>
+          <li><b>Slippage</b> — зах зээлийн захиалга, stop-loss нь харсан үнээс чинь муу үнээр биелж болно.</li>
+          <li><b>Gap</b> — амралтын өдөр, том мэдээний дараа үнэ үсэрч stop-loss-ийг давж нээгдэнэ. SL бол баталгаат хамгаалалт биш.</li>
+        </ul>
+      </div>
     </div>
   </div>
 
@@ -344,6 +378,7 @@
       <div class="stp"><div class="n">4</div><div class="tx"><b>Үр дүнгээ хар.</b> "Статистик" табаас хожих хувь, profit factor, хөрөнгийн муруйгаа хянаж, өөрийгөө сайжруул.</div></div>
     </div>
     <div class="warn"><b>Санах зүйл:</b> хэт том лот барьж хөшүүрэг хэтрүүлбэл маржин хүрэлцэхгүй болж позиц <b>албадан хаагдана (stop out)</b> — яг л жинхэнэ дансанд. Эхлээд жижгээр, болгоомжтой.</div>
+    <div class="warn"><b>Бодит зах зээл хатуу:</b> энэ симуляцид spread тогтмол, slippage ба gap бараг байхгүй. Бодит дансанд spread өргөсөж, захиалга муу үнээр биелж, амралтын дараа үнэ stop-loss-ийг давж үсэрч болно. Демо дээрх ашиг бодит ашгийн баталгаа биш.</div>
     <button class="start" id="startBtn">Дадлага эхлэх →</button>
   </div>
 </div>

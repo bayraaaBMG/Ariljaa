@@ -4,7 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 36 36%27%3E%3Crect x=%271%27 y=%271%27 width=%2734%27 height=%2734%27 rx=%279%27 fill=%27%231c1813%27 stroke=%27%23e0a526%27 stroke-width=%271.6%27/%3E%3Cline x1=%2710.5%27 y1=%2724%27 x2=%2710.5%27 y2=%2713%27 stroke=%27%238a8070%27 stroke-width=%271.3%27/%3E%3Crect x=%278%27 y=%2717%27 width=%275%27 height=%275.5%27 rx=%27.5%27 fill=%27%238a8070%27/%3E%3Cline x1=%2718%27 y1=%2727%27 x2=%2718%27 y2=%279%27 stroke=%27%23e0a526%27 stroke-width=%271.3%27/%3E%3Crect x=%2715.5%27 y=%2713%27 width=%275%27 height=%279%27 rx=%27.5%27 fill=%27%23e0a526%27/%3E%3Cline x1=%2725.5%27 y1=%2721%27 x2=%2725.5%27 y2=%277%27 stroke=%27%23f3c969%27 stroke-width=%271.3%27/%3E%3Crect x=%2723%27 y=%279%27 width=%275%27 height=%277%27 rx=%27.5%27 fill=%27%23f3c969%27/%3E%3C/svg%3E">
-<title>Түгээмэл асуулт хариулт — Арилжаачны Дэвтэр</title>
+<title>Арилжааны түгээмэл асуулт хариулт (FAQ) · Арилжаачны Дэвтэр</title>
+<meta name="description" content="Spread, хөшүүрэг, margin call, stop-loss болон шинэхэн трейдерүүдийн хамгийн их асуудаг асуултын шударга хариулт, статистикийн эх сурвалж.">
+<link rel="canonical" href="https://ariljaa.vercel.app/faq.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Арилжаачны Дэвтэр">
+<meta property="og:locale" content="mn_MN">
+<meta property="og:title" content="Арилжааны түгээмэл асуулт хариулт (FAQ) · Арилжаачны Дэвтэр">
+<meta property="og:description" content="Spread, хөшүүрэг, margin call, stop-loss болон шинэхэн трейдерүүдийн хамгийн их асуудаг асуултын шударга хариулт, статистикийн эх сурвалж.">
+<meta property="og:url" content="https://ariljaa.vercel.app/faq.html">
+<meta name="twitter:card" content="summary">
 <link rel="stylesheet" href="style.css">
 <style>
   /* ---- FAQ accordion ---- */
@@ -52,7 +61,7 @@
 <body>
 <div class="progress-bar" id="progressBar"></div>
 <button type="button" class="totop" id="toTop" aria-label="Дээш гүйлгэх">↑</button>
-<div class="ticker"><span>МЭДЭГДЭХҮҮН: ЖИЖИГЛЭНГИЙН АРИЛЖААЧДЫН 70–90% НЬ МӨНГӨӨ АЛДДАГ • ЭНЭ БОЛ ХУРДАН БАЯЖИХ АРГА БИШ • ЗӨВХӨН АЛДАЖ БОЛОХ МӨНГИЙГ Л АРИЛЖ БОЛНО •</span></div>
+<div class="ticker" role="note"><b>⚠ Мэдэгдэхүүн</b><span class="t-full">Жижиглэнгийн арилжаачдын 70–90% нь мөнгөө алддаг · Хурдан баяжих арга биш · Зөвхөн алдаж болох мөнгөөрөө арилж</span><span class="t-short">Арилжаачдын 70–90% нь мөнгөө алддаг</span></div>
 
 <nav class="chapnav">
   <div class="wrap chapnav-inner">
@@ -330,6 +339,29 @@
 
     </div>
 
+    <span class="faq-badge" style="margin-top:40px;display:inline-block">Статистик · Эх сурвалж</span>
+    <div class="faq-list">
+
+      <div class="faq-item" id="stats">
+        <button class="faq-q" aria-expanded="false">
+          "70–90% нь мөнгөө алддаг", "&lt;1% нь тогтвортой ашигтай" гэдэг тоо хаанаас гарсан бэ?
+          <i class="faq-icon">+</i>
+        </button>
+        <div class="faq-a" role="region">
+          <div class="faq-a-inner">
+            <p>Эдгээр нь нэг судалгааны тоо биш, хэд хэдэн эх сурвалжийн <b>ерөнхий хүрээ</b> юм. Тиймээс бид нэг тодорхой тоо биш, хүрээгээр нь бичдэг.</p>
+            <ul>
+              <li><b>ESMA (Европын үнэт цаас, зах зээлийн газар), 2018:</b> хэд хэдэн улсын брокеруудын өгөгдлөөр жижиглэнгийн CFD дансны <b>74–89%</b> нь алдагдалтай байжээ.</li>
+              <li><b>Зохицуулалттай брокерууд:</b> ЕХ, Их Британид CFD брокер бүр сүүлийн 12 сарын алдагдалтай дансны хувийг нүүр хуудсандаа заавал нийтэлдэг. Энэ нь ихэвчлэн <b>70–80%-иас дээш</b> байдаг.</li>
+              <li><b>Barber, Lee, Liu &amp; Odean</b> (Тайванийн өдрийн арилжаачдын олон жилийн өгөгдөл): шимтгэлийг хассаны дараа жил дараалан тогтвортой ашигтай байж чадсан нь <b>1%-иас бага</b>.</li>
+            </ul>
+            <p>Тоо нь зах зээл, улс, хугацаанаас хамаарч өөр өөр гардаг. Гэхдээ дүгнэлт нь үргэлж ижил: <em>ихэнх жижиглэнгийн арилжаачид урт хугацаанд мөнгөө алддаг.</em></p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
     <div class="source-note">
       <b>Эх сурвалж:</b> Энэ хуудасны зарим асуулт хариулт нь MOT Capital-ийн Форекс арилжааны FAQ нийтлэл дээр үндэслэсэн бөгөөд сайтын агуулгаар өргөжүүлж гүнзгийрүүлсэн болно.
     </div>
@@ -391,6 +423,13 @@ document.querySelectorAll('.faq-q').forEach(btn=>{
     }
   });
 });
+
+/* #stats гэх мэт холбоосоор ирвэл тухайн асуултыг нээх */
+const target=document.getElementById(decodeURIComponent(location.hash.slice(1)));
+if(target&&target.classList.contains('faq-item')){
+  target.querySelector('.faq-q').click();
+  setTimeout(()=>target.scrollIntoView({behavior:'smooth',block:'center'}),120);
+}
 </script>
 </body>
 </html>
